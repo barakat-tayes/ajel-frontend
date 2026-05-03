@@ -1,0 +1,559 @@
+.driverDashboardContainer {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 12px;
+}
+.stickyTop {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: #f8fafc;
+  padding-bottom: 8px;
+}
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 0 15px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  border-radius: 14px;
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(227, 30, 36, 0.2);
+}
+.welcomeTitle {
+  font-size: 0.96rem;
+  font-weight: 800;
+}
+.headerLogo {
+  width: clamp(80px, 11.6vw, 104px);
+  height: clamp(80px, 11.6vw, 104px);
+  border-radius: 12px;
+  object-fit: contain;
+  object-position: center;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.statCard {
+  background: #fff;
+  border: 1px solid #ffd9b3;
+  border-radius: 12px;
+  padding: 12px;
+  min-height: 112px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  align-items: center;
+}
+.statLabel {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 800;
+}
+.statValue {
+  font-size: 1.75rem;
+  color: #e31e24;
+  font-weight: 900;
+  line-height: 1.1;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: start;
+}
+.statAmount {
+  font-size: 0.92rem;
+  color: #0f172a;
+  font-weight: 800;
+}
+.filterRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.filterRow > * {
+  min-width: 0;
+}
+.dateRangeWrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 8px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.dateRangeWrap > * {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: calc(50% - 4px);
+}
+.dateInput {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  padding: 0.46rem 0.52rem;
+  border-radius: 0.55rem;
+  font-size: 0.9rem;
+}
+.quickRow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(70px, 1fr));
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.quickBtn {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 9px;
+  padding: 6px 4px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #334155;
+}
+.quickBtnActive {
+  background: #e31e24;
+  color: #fff;
+  border-color: #e31e24;
+}
+
+.availableOrdersSection {
+  height: calc(100vh - 290px);
+  display: flex;
+  flex-direction: column;
+}
+.availableOrdersTitle {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #334155;
+  margin: 4px 2px 8px;
+}
+.availableOrdersGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.availableOrderCard {
+  display: block;
+  background: #fff;
+  border: 1px solid #eceff3;
+  border-radius: 12px;
+  padding: 10px 10px;
+  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.07);
+  min-height: 136px;
+  overflow: hidden;
+}
+.availableOrderRestaurantBar {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 7px 10px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.availableOrderContent {
+  display: grid;
+  grid-template-columns: 40px 1fr 58px;
+  align-items: stretch;
+  gap: 8px;
+  min-height: 92px;
+}
+.availableOrderBody {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+.orderTopRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.orderBottomRow {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-top: -1px;
+}
+.availableOrderBody .orderBottomRow {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.availableOrderBody .orderBottomRow p:first-child {
+  text-align: right;
+  justify-self: start;
+}
+.availableOrderBody .orderBottomRow p:last-child {
+  text-align: left;
+  justify-self: end;
+}
+.availableOrderBody .orderBottomRow .address {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1;
+  font-size: clamp(0.7rem, 1.9vw, 0.86rem);
+}
+.orderThirdRow {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.restaurantHint {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mapIconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  border-radius: 999px;
+  width: 24px;
+  height: 24px;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.restaurantName {
+  font-weight: 900;
+  color: #0f172a;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.address {
+  font-size: 0.84rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.32;
+}
+.deliveryFeeBadge {
+  background: #fff4e6;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.acceptPillBtn {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 6px 6px;
+  font-weight: 900;
+  font-size: 0.78rem;
+  height: 90%;
+  width: 100%;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rejectIconBtn {
+  background: #fff1f2;
+  color: #dc2626;
+  border: 1px solid #fecdd3;
+  border-radius: 12px;
+  width: 100%;
+  height: 90%;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  line-height: 1;
+}
+.acceptButton {
+  background: #fff;
+  color: #e31e24;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 0.5rem 0.72rem;
+  font-weight: 900;
+  font-size: 1.18rem;
+  line-height: 1;
+}
+
+.currentOrderCard {
+  background: #fff;
+  border: 1px solid #fbd5be;
+  border-radius: 15px;
+  padding: 16px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+.currentOrderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.currentOrderTitle {
+  font-size: 1.08rem;
+  font-weight: 900;
+}
+.currentOrderStatus {
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: #b45309;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+.currentOrderBody {
+  margin-top: 12px;
+}
+.currentOrderActions {
+  display: grid;
+  grid-template-columns: 1fr 54px;
+  gap: 10px;
+  margin-top: 12px;
+}
+.currentOrderActionsAccepted {
+  grid-template-columns: 1fr 1fr;
+}
+.callBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 900;
+  min-height: 48px;
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.18);
+}
+.rejectWideBtn {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 900;
+  font-size: 0.86rem;
+  min-height: 48px;
+  box-shadow: 0 8px 16px rgba(244, 63, 94, 0.14);
+}
+.currentOrderActionsThree {
+  grid-template-columns: 64px 1fr 1fr;
+  align-items: stretch;
+}
+.currentOrderActionsThree .acceptPillBtn {
+  min-height: 50px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(22, 163, 74, 0.22);
+}
+.pickupBtn {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 11px 12px;
+  font-weight: 900;
+  min-height: 50px;
+  box-shadow: 0 8px 16px rgba(22, 163, 74, 0.25);
+}
+.cancelBtn {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+  border-radius: 12px;
+  padding: 11px 12px;
+  font-weight: 900;
+  min-height: 50px;
+}
+
+@media (max-width: 900px) {
+  .availableOrderContent {
+    grid-template-columns: 42px 1fr 70px;
+  }
+}
+@media (max-width: 560px) {
+  .driverDashboardContainer {
+    padding: 10px;
+  }
+  .dateRangeWrap {
+    gap: 8px;
+  }
+  .dateInput {
+    padding: 0.4rem 0.45rem;
+    font-size: 0.82rem;
+  }
+  .availableOrdersSection {
+    height: calc(100vh - 300px);
+  }
+  .orderTopRow {
+    grid-template-columns: 1fr auto auto;
+  }
+  .orderBottomRow {
+    grid-template-columns: 1fr auto;
+  }
+  .availableOrderBody .orderBottomRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
+  .availableOrderBody .orderBottomRow .address {
+    font-size: clamp(0.66rem, 3vw, 0.8rem);
+  }
+  .orderThirdRow {
+    grid-template-columns: 24px 1fr;
+  }
+  .availableOrderCard {
+    padding: 8px;
+    min-height: 124px;
+  }
+  .availableOrderContent {
+    grid-template-columns: 30px 1fr 55px;
+    min-height: 80px;
+  }
+  .acceptPillBtn {
+    padding: 6px 6px;
+    font-size: 0.72rem;
+    height: 80%;
+  }
+  .rejectIconBtn {
+    height: 80%;
+    font-size: 0.9rem;
+  }
+  .currentOrderActions {
+    grid-template-columns: 48px 1fr 1fr;
+  }
+  .currentOrderActionsAccepted {
+    grid-template-columns: 1fr 1fr;
+  }
+  .currentOrderActionsThree {
+    grid-template-columns: 48px 1fr 1fr;
+  }
+  .callBtn,
+  .rejectWideBtn,
+  .currentOrderActionsThree .acceptPillBtn {
+    min-height: 44px;
+  }
+  .headerLogo {
+    width: 60px;
+    height: 60px;
+    margin: 6px;
+  }
+  .welcomeTitle {
+    font-size: 0.9rem;
+  }
+}
+@media (min-width: 768px) {
+  .dashboardHeader {
+    padding: 0 15px;
+    min-height: 72px;
+    overflow: visible;
+  }
+  .headerLogo {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    /* margin-block: -67px; */
+  }
+  .welcomeTitle {
+    font-size: 1.02rem;
+  }
+  .currentOrderCard {
+    padding: 22px;
+    border-radius: 18px;
+  }
+  .currentOrderTitle {
+    font-size: 1.24rem;
+  }
+  .currentOrderBody {
+    margin-top: 14px;
+  }
+  .deliveryFeeBadge {
+    font-size: 0.84rem;
+    padding: 5px 9px;
+  }
+  .address {
+    font-size: 0.92rem;
+  }
+  .restaurantHint {
+    font-size: 0.9rem;
+  }
+  .currentOrderActions {
+    margin-top: 14px;
+  }
+  .pickupBtn,
+  .cancelBtn,
+  .callBtn,
+  .rejectWideBtn,
+  .currentOrderActionsThree .acceptPillBtn {
+    min-height: 56px;
+    font-size: 0.95rem;
+  }
+}
+@media (min-width: 1024px) {
+  .dashboardHeader {
+    min-height: 76px;
+  }
+  .headerLogo {
+    width: 67px;
+    height: 180px;
+    border-radius: 14px;
+    margin-block: -32px;
+  }
+  .welcomeTitle {
+    font-size: 1.08rem;
+  }
+  .currentOrderCard {
+    padding: 26px;
+  }
+  .currentOrderTitle {
+    font-size: 1.34rem;
+  }
+  .currentOrderStatus {
+    font-size: 0.9rem;
+  }
+  .address {
+    font-size: 0.98rem;
+  }
+  .deliveryFeeBadge {
+    font-size: 0.9rem;
+  }
+}

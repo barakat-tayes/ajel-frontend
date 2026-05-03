@@ -1,0 +1,256 @@
+.authPage {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #ffe8a6 0%, #ffd35a 42%, #ffb800 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  font-family: "Almarai", "Segoe UI", Tahoma, sans-serif;
+}
+
+.card {
+  width: 100%;
+  max-width: 560px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 20px 42px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+  border: 1px solid #ffe3ad;
+  padding-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  max-height: 92vh;
+}
+
+.logoWrap {
+  background: linear-gradient(135deg, #f97316 0%, #ef4444 58%, #f59e0b 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 16px 16px;
+}
+
+.logoImage {
+  width: 124px;
+  height: 124px;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 14px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  transform: none;
+  /* box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16); */
+}
+
+@media (min-width: 768px) {
+  .logoImage {
+    width: 136px;
+    height: 136px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .logoImage {
+    width: 148px;
+    height: 148px;
+  }
+}
+
+.title {
+  margin: 12px 0 0;
+  font-size: 1.56rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.form {
+  display: grid;
+  gap: 11px;
+  padding: 16px;
+}
+
+.formScrollArea {
+  overflow-y: auto;
+  max-height: calc(92vh - 210px);
+}
+
+.accountTypeSwitch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 14px;
+  padding: 6px;
+}
+
+.accountTypeBtn {
+  border: 1px solid #fec89a;
+  background: #fff;
+  color: #9a3412;
+  border-radius: 10px;
+  padding: 10px 8px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.accountTypeBtn:hover {
+  border-color: #0f172a;
+  background: #f69d00;
+}
+
+.accountTypeBtnActive {
+  background: linear-gradient(135deg, #eb2727, #f78b3e);
+  color: #af191d;
+  border-color: #ef4444;
+  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.25);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid #dbe0e6;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 12px 12px;
+  font-size: 1rem;
+  color: #111827;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #ff7a45;
+  box-shadow: 0 0 0 3px rgba(255, 107, 61, 0.2);
+  background: #fff;
+}
+
+.error {
+  margin: 12px 16px 0;
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.ok {
+  margin: 12px 16px 0;
+  background: #ecfdf3;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.primaryBtn {
+  width: 100%;
+  background: #e31e24;
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 1.04rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primaryBtn:hover {
+  background: #be123c;
+}
+
+.linkRow {
+  text-align: center;
+  color: #475569;
+  font-size: 0.92rem;
+}
+
+.link {
+  color: #d11a20;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.linkButton {
+  background: none;
+  border: 0;
+  color: #d11a20;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 0.94rem;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 99;
+}
+
+.modalCard {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 24px 40px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 700px) {
+  .card {
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 560px) {
+  .authPage {
+    padding: 12px;
+  }
+  .card {
+    border-radius: 16px;
+  }
+  .logoImage {
+    width: 104px;
+    height: 104px;
+    border-radius: 12px;
+  }
+  .title {
+    font-size: 1.26rem;
+  }
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+  .form {
+    padding: 14px;
+  }
+  .formScrollArea {
+    max-height: calc(92vh - 190px);
+  }
+  .accountTypeSwitch {
+    grid-template-columns: 1fr 1fr;
+  }
+}

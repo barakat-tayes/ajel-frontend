@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/icon-192.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#ff9f1c" />
+  <meta name="description" content="عاجل - نظام توصيل الطلبات" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="عاجل" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/icon-192.png" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <script>
+    (function () {
+      try {
+        var ua = navigator.userAgent || "";
+        var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        var isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+        if (!(isIOS && isSafari)) return;
+
+        // Suppress opaque Safari "Script error." noise before React overlay hooks.
+        window.addEventListener("error", function (event) {
+          var msg = String((event && event.message) || "");
+          if (msg === "Script error." || msg.toLowerCase() === "script error") {
+            try { event.preventDefault(); } catch (e) {}
+            try { event.stopImmediatePropagation(); } catch (e) {}
+            return false;
+          }
+        }, true);
+
+        window.addEventListener("unhandledrejection", function (event) {
+          var reason = (event && event.reason) || {};
+          var name = String(reason.name || "");
+          var message = String(reason.message || "");
+          if (name === "AbortError" || message.toLowerCase().indexOf("abort") !== -1) {
+            try { event.preventDefault(); } catch (e) {}
+            try { event.stopImmediatePropagation(); } catch (e) {}
+            return false;
+          }
+        }, true);
+
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            return Promise.all(regs.map(function (r) { return r.unregister(); }));
+          }).catch(function () {});
+        }
+        if ("caches" in window) {
+          caches.keys().then(function (keys) {
+            return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+          }).catch(function () {});
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <title>عاجل للتوصيل</title>
+</head>
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+</body>
+</html>
