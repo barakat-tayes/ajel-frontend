@@ -114,7 +114,7 @@ function InstallPromptBar() {
     return (
       <div style={barStyle}>
         <span style={textStyle}>
-          لتثبيت التطبيق على iPhone: اضغط زر المشاركة في Safari ثم اختر Add to Home Screen
+          لتثبيت التطبيق على iPhone: اضغط زر المشاركة في Safari ثم اختر اضافة الى الشاشة الرئيسية
         </span>
       </div>
     );
