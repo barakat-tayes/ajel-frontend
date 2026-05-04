@@ -3,6 +3,7 @@ import { useAuth } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 import api from "./api";
 import io from "socket.io-client";
+import { SOCKET_BASE_URL } from "./runtimeConfig";
 
 export default function RestaurantSuspendedPage() {
   const { logout, user } = useAuth();
@@ -45,7 +46,7 @@ export default function RestaurantSuspendedPage() {
     checkStatus();
     const timer = setInterval(checkStatus, 8000);
 
-    const s = io(`http://${window.location.hostname}:5000`);
+    const s = io(SOCKET_BASE_URL);
     if (user?.id) s.emit("join", { userType: "restaurant", userId: user.id });
     s.on("admin_clear_warnings", () => navigate("/restaurant", { replace: true }));
 

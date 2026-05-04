@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 import api from "./api";
 import { useAuth } from "./AuthContext";
+import { SOCKET_BASE_URL } from "./runtimeConfig";
 
 export default function DriverSuspendedPage() {
   const { user, logout } = useAuth();
@@ -49,7 +50,7 @@ export default function DriverSuspendedPage() {
 
   useEffect(() => {
     if (!user?.id) return;
-    const s = io(`http://${window.location.hostname}:5000`);
+    const s = io(SOCKET_BASE_URL);
     s.emit("join", { userType: "driver", userId: user.id, province: user.province });
     s.on("admin_driver_suspended", (payload) => {
       if (payload?.message) setMessage(payload.message);

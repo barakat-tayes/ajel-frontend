@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import api from "./api";
 import { useAuth } from "./AuthContext";
 import styles from "./AdminDashboard.module.css";
+import { SOCKET_BASE_URL } from "./runtimeConfig";
 
 const ALL_PROVINCES = "__all__";
 const asIqd = (value) => `${Math.round(Number(value || 0)).toLocaleString("en-US")} د.ع`;
@@ -63,9 +64,9 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!user || user.userType !== "admin") return;
-    const s = io(`http://${window.location.hostname}:5000`);
+    const s = io(SOCKET_BASE_URL);
     s.emit("join", { userType: "admin", userId: user.id });
-    ["new_order_created", "order_accepted", "order_delivered", "order_returned", "order_cancelled", "driver_rejected"].forEach((evt) =>
+    ["new_order_created", "order_accepted", "order_delivered", "order_returned", "order_cancelled", "driver_rejected", "new_join_request"].forEach((evt) =>
       s.on(evt, () => load())
     );
     return () => s.close();
@@ -198,15 +199,15 @@ export default function AdminDashboard() {
     <div dir="rtl" className={styles.adminShell}>
       <aside className={`${styles.adminSidebar} ${sidebarOpen ? styles.adminSidebarOpen : ""}`}>
         <div style={{ fontWeight: 900, fontSize: 20, color: "#fff", marginBottom: 10 }}>Ajel Admin</div>
-        <button onClick={() => setView("restaurants")} style={sideBtn(view === "restaurants")}>التجار</button>
-        <button onClick={() => setView("drivers")} style={sideBtn(view === "drivers")}>السائقون</button>
-        <button onClick={() => setView("requests")} style={sideBtn(view === "requests")}>
+        <button onClick={() => setView("restaurants")} className={`${styles.sidebarTab} ${view === "restaurants" ? styles.sidebarTabActive : ""}`}>التجار</button>
+        <button onClick={() => setView("drivers")} className={`${styles.sidebarTab} ${view === "drivers" ? styles.sidebarTabActive : ""}`}>السائقون</button>
+        <button onClick={() => setView("requests")} className={`${styles.sidebarTab} ${view === "requests" ? styles.sidebarTabActive : ""}`}>
           طلبات الانضمام
           {pendingRequests > 0 ? <span style={badgeStyle}>{pendingRequests}</span> : null}
         </button>
-        <button onClick={() => setView("settings")} style={sideBtn(view === "settings")}>إعدادات الأدمن</button>
+        <button onClick={() => setView("settings")} className={`${styles.sidebarTab} ${view === "settings" ? styles.sidebarTabActive : ""}`}>إعدادات الأدمن</button>
         <div style={{ marginTop: "auto" }}>
-          <button onClick={logout} style={{ ...sideBtn(false), width: "100%", background: "#dc2626", color: "#fff", justifyContent: "center" }}>تسجيل الخروج</button>
+          <button onClick={logout} className={styles.sidebarTab} style={{ width: "100%", background: "#dc2626", color: "#fff", justifyContent: "center", borderColor: "#dc2626" }}>تسجيل الخروج</button>
         </div>
       </aside>
 
@@ -426,23 +427,6 @@ function StatCard({ title, value, accent = false }) {
       <div style={{ fontSize: 24, fontWeight: 900, color: accent ? "#e31e24" : "#0f172a" }}>{value}</div>
     </div>
   );
-}
-
-function sideBtn(active) {
-  return {
-    border: "1px solid transparent",
-    borderRadius: 10,
-    padding: "10px 12px",
-    background: active ? "#1f2937" : "transparent",
-    color: "#e5e7eb",
-    fontWeight: 800,
-    textAlign: "right",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
-  };
 }
 
 function miniBtn(bg, color) {

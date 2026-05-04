@@ -1,95 +1,143 @@
-.adminShell{
-  min-height:100vh;
-  background:#f4f6fb;
-  display:grid;
-  grid-template-columns:260px 1fr;
+.adminShell {
+  min-height: 100vh;
+  background: #f4f6fb;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  font-family: "Almarai", sans-serif;
+  font-size: 15px;
 }
 
-.adminSidebar{
-  background:#111827;
-  color:#e5e7eb;
-  padding:16px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+.adminSidebar {
+  background: #111827;
+  color: #e5e7eb;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.adminMain{
-  padding:16px;
-  overflow:hidden;
+.sidebarTab {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 11px 13px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #e5e7eb;
+  font-weight: 800;
+  font-size: 15px;
+  text-align: right;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  transition: all 0.18s ease;
+  font-family: "Almarai";
 }
 
-.mobileTopBar{
-  display:none;
+.sidebarTab:hover {
+  background: #334155;
+  border-color: #64748b;
+  color: #ffffff;
 }
 
-.menuBtn{
-  border:1px solid #cbd5e1;
-  background:#fff;
-  color:#0f172a;
-  border-radius:8px;
-  width:34px;
-  height:34px;
-  font-size:18px;
-  line-height:1;
-  cursor:pointer;
+.sidebarTabActive {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-color: #ef4444;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.26);
 }
 
-.stickyTop{
-  position:sticky;
-  top:0;
-  z-index:5;
-  background:#f4f6fb;
-  padding-bottom:10px;
+.adminMain {
+  padding: 18px;
+  overflow: hidden;
 }
 
-.contentArea{
-  margin-top:10px;
-  height:calc(100vh - 190px);
-  overflow:auto;
-  padding-inline-end:4px;
+.mobileTopBar {
+  display: none;
+}
+
+.menuBtn {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0f172a;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.stickyTop {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #f4f6fb;
+  padding-bottom: 10px;
+}
+
+.contentArea {
+  margin-top: 10px;
+  height: calc(100vh - 190px);
+  overflow: auto;
+  padding-inline-end: 4px;
+}
+
+@media (min-width: 1200px) {
+  .adminShell {
+    font-size: 16px;
+  }
+
+  .adminMain {
+    padding: 22px;
+  }
+
+  .adminSidebar {
+    padding: 20px;
+    gap: 12px;
+  }
 }
 
 /* mobile */
-@media (max-width: 900px){
-  .adminShell{
-    grid-template-columns:1fr;
+@media (max-width: 900px) {
+  .adminShell {
+    grid-template-columns: 1fr;
   }
 
-  .adminSidebar{
-    position:fixed;
-    inset:0 auto 0 0;
-    width:min(84vw,300px);
-    transform:translateX(-105%);
-    transition:transform .22s ease;
-    z-index:30;
-    box-shadow:0 8px 22px rgba(0,0,0,.25);
+  .adminSidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: min(84vw, 300px);
+    transform: translateX(-105%);
+    transition: transform 0.22s ease;
+    z-index: 30;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
   }
 
-  .adminSidebarOpen{
-    transform:translateX(0);
+  .adminSidebarOpen {
+    transform: translateX(0);
   }
 
-  .adminMain{
-    padding:12px;
+  .adminMain {
+    padding: 12px;
   }
 
-  .mobileTopBar{
-    display:flex;
-    align-items:center;
-    justify-content:flex-start;
-    gap:10px;
-    margin-bottom:10px;
+  .mobileTopBar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
   }
 
-  .stickyTop{
-    top:0;
+  .stickyTop {
+    top: 0;
   }
 
-  .contentArea{
-    height:calc(100vh - 170px);
-    overflow-y:auto;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
+  .contentArea {
+    height: calc(100vh - 170px);
+    overflow-y: auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }

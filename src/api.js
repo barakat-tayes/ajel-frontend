@@ -1,6 +1,4 @@
-const host = window.location.hostname || "localhost";
-const envApi = process.env.REACT_APP_API_URL;
-const BASE_URL = envApi ? envApi.replace(/\/$/, "") : `http://${host}:5000/api`;
+import { API_BASE_URL } from "./runtimeConfig";
 
 const apiFetch = async(url, options = {}) => {
     const token = localStorage.getItem("token");
@@ -15,7 +13,7 @@ const apiFetch = async(url, options = {}) => {
         body = JSON.stringify(body);
     }
 
-    const response = await fetch(`${BASE_URL}${url}`, {
+    const response = await fetch(`${API_BASE_URL}${url}`, {
         ...options,
         method,
         headers,

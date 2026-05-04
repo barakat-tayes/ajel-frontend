@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import api from "./api";
 import { useAuth } from "./AuthContext";
 import styles from "./DriverDashboard.module.css";
+import { SOCKET_BASE_URL } from "./runtimeConfig";
 
 export default function DriverDashboard() {
   const { user } = useAuth();
@@ -66,7 +67,7 @@ export default function DriverDashboard() {
 
   useEffect(() => {
     if (!filters.start_date || !filters.end_date) return;
-    const s = io(`http://${window.location.hostname}:5000`);
+    const s = io(SOCKET_BASE_URL);
     s.emit("join", {
       userType: "driver",
       userId: user.id,

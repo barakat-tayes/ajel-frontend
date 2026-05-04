@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import api from "./api";
 import { useAuth } from "./AuthContext";
 import styles from "./RestaurantDashboard.module.css";
+import { SOCKET_BASE_URL } from "./runtimeConfig";
 
 const toLocalDate = (d = new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -30,6 +31,7 @@ export default function RestaurantDashboard() {
   const [warningBar, setWarningBar] = useState("");
   const [dueSummary, setDueSummary] = useState({ due_amount: 0, completed_count: 0 });
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [networkError, setNetworkError] = useState("");
   const [form, setForm] = useState({
     customer_name: "",
     customer_phone: "",
@@ -80,15 +82,31 @@ export default function RestaurantDashboard() {
   };
 
   useEffect(() => {
-    loadOrders();
-    loadTracking();
-    loadDueSummary();
-    loadProfileFlags();
+    const run = async () => {
+      try {
+        setNetworkError("");
+        await Promise.all([loadOrders(), loadTracking(), loadDueSummary(), loadProfileFlags()]);
+      } catch (e) {
+        setNetworkError("تعذر الاتصال بالخادم مؤقتًا. سيتم إعادة المحاولة تلقائيًا.");
+      }
+    };
+    run();
   }, [filters.start_date, filters.end_date]);
 
   useEffect(() => {
+    if (!networkError) return undefined;
+    const t = setTimeout(async () => {
+      try {
+        await Promise.all([loadOrders(), loadTracking(), loadDueSummary(), loadProfileFlags()]);
+        setNetworkError("");
+      } catch {}
+    }, 2500);
+    return () => clearTimeout(t);
+  }, [networkError]);
+
+  useEffect(() => {
     if (!user?.id) return;
-    const s = io(`http://${window.location.hostname}:5000`);
+    const s = io(SOCKET_BASE_URL);
     s.emit("join", { userType: "restaurant", userId: user.id });
     s.on("order_accepted", async (payload) => {
       await Promise.all([loadOrders(), loadTracking(), loadDueSummary()]);
@@ -266,6 +284,11 @@ export default function RestaurantDashboard() {
           </div>
         </div>
 
+        {networkError ? (
+          <div className={styles.warningBar} style={{ background: "#fff1f2", color: "#b91c1c", border: "1px solid #fecdd3" }}>
+            {networkError}
+          </div>
+        ) : null}
         {warningBar ? <div className={styles.warningBar}>{warningBar}</div> : null}
 
         <div className={styles.summaryGrid}>
