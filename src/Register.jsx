@@ -43,19 +43,38 @@ export default function Register() {
   });
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
+  const [locating, setLocating] = useState(false);
 
   const onChange = (e) =>
     setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const pickCurrentLocation = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) => {
-      setFormData((p) => ({
-        ...p,
-        location_lat: String(pos.coords.latitude),
-        location_lng: String(pos.coords.longitude),
-      }));
-    });
+    if (!navigator.geolocation) {
+      setError("المتصفح لا يدعم تحديد الموقع");
+      return;
+    }
+    setError("");
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setFormData((p) => ({
+          ...p,
+          location_lat: String(pos.coords.latitude),
+          location_lng: String(pos.coords.longitude),
+        }));
+        setLocating(false);
+      },
+      (geoError) => {
+        const map = {
+          1: "تم رفض إذن الموقع. فعّل إذن الموقع من المتصفح.",
+          2: "تعذر تحديد موقعك الحالي.",
+          3: "انتهت مهلة تحديد الموقع. حاول مرة أخرى.",
+        };
+        setError(map[geoError?.code] || "تعذر تحديد الموقع الحالي.");
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
+    );
   };
 
   const submit = async (e) => {
@@ -226,6 +245,7 @@ export default function Register() {
                 type="button"
                 className={styles.linkButton}
                 onClick={pickCurrentLocation}
+                disabled={locating}
               >
                 تحديد موقعي الحالي
               </button>

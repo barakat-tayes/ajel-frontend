@@ -433,15 +433,42 @@ export default function DriverDashboard() {
             {availableOrders.map((o) => (
               <div key={o.id} className={styles.availableOrderCard}>
                 <div className={styles.availableOrderContent}>
-                  <button
-                    className={styles.rejectIconBtn}
-                    onClick={() => reject(o.id)}
-                  >
-                    ×
-                  </button>
+                  <div className={styles.orderActionsColumn}>
+                    <button
+                      className={styles.acceptPillBtn}
+                      onClick={() => accept(o.id)}
+                      title="قبول"
+                      aria-label="قبول"
+                    />
+                    <button
+                      className={styles.rejectIconBtn}
+                      onClick={() => reject(o.id)}
+                      title="رفض"
+                      aria-label="رفض"
+                    />
+                  </div>
                   <div className={styles.availableOrderBody}>
                     <div className={styles.availableOrderRestaurantBar}>
-                      {o.restaurant_name || "-"}
+                      <span className={styles.restaurantBarName}>
+                        {o.restaurant_name || "-"}
+                      </span>
+                      <a
+                        className={`${styles.mapIconBtn} ${styles.restaurantMapBtn}`}
+                        href={
+                          o.restaurant_location_link ||
+                          (o.restaurant_location_lat &&
+                          o.restaurant_location_lng
+                            ? `https://maps.google.com/?q=${o.restaurant_location_lat},${o.restaurant_location_lng}`
+                            : `https://maps.google.com/?q=${encodeURIComponent(
+                                o.restaurant_name || "restaurant",
+                              )}`)
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                        title="موقع المطعم"
+                      >
+                        📍
+                      </a>
                     </div>
                     <div className={styles.orderTopRow}>
                       <p className={styles.deliveryFeeBadge}>
@@ -453,18 +480,11 @@ export default function DriverDashboard() {
                     </div>
                     <div className={styles.orderBottomRow}>
                       <p className={styles.address}>
-                        {" "}
-                        {o.customer_address || "-"}
+                        العنوان: {o.customer_address || "-"}
                       </p>
-                      <p className={styles.address}> {o.order_type || "-"}</p>
+                      <p className={styles.address}>الطلبية: {o.order_type || "-"}</p>
                     </div>
                   </div>
-                  <button
-                    className={styles.acceptPillBtn}
-                    onClick={() => accept(o.id)}
-                  >
-                    قبول
-                  </button>
                 </div>
               </div>
             ))}
