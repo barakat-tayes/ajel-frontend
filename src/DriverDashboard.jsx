@@ -337,7 +337,7 @@ export default function DriverDashboard() {
             <div className={styles.orderBottomRow}>
               <p className={styles.address}>{currentOrder.customer_address}</p>
               <p className={styles.address}>
-                النوع: {currentOrder.order_type || "-"}
+                الطلبية: {currentOrder.order_type || "-"}
               </p>
             </div>
             <div className={styles.orderThirdRow}>
@@ -480,9 +480,9 @@ export default function DriverDashboard() {
                     </div>
                     <div className={styles.orderBottomRow}>
                       <p className={styles.address}>
-                        العنوان: {o.customer_address || "-"}
+                        {o.customer_address || "-"}
                       </p>
-                      <p className={styles.address}>الطلبية: {o.order_type || "-"}</p>
+                      <p className={styles.address}>{o.order_type || "-"}</p>
                     </div>
                   </div>
                 </div>

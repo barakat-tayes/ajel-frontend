@@ -39,6 +39,16 @@
   border: 2px solid #111;
   border-radius: 10px;
 }
+.coordsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.coordInput {
+  padding: 9px 10px;
+  font-size: 0.92rem;
+}
 .actions {
   display: flex;
   gap: 8px;
@@ -126,5 +136,11 @@
   }
   .policyScroll::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
+  }
+}
+
+@media (max-width: 640px) {
+  .coordsRow {
+    grid-template-columns: 1fr;
   }
 }

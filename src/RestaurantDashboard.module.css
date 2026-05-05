@@ -338,10 +338,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .tabButton {
-    font-size: 0.78rem;
+    font-size: 14px;
   }
   .summaryCard {
-    min-height: 96px;
+    min-height: 88px;
   }
   .summaryValue {
     font-size: 1.35rem;
@@ -352,10 +352,12 @@
     padding-inline-end: 2px;
   }
   .line1 {
-    font-size: 0.5rem;
+    font-size: 12px;
+    text-wrap: wrap;
   }
   .line2 {
-    font-size: 0.5rem;
+    font-size: 13px;
+    text-wrap: wrap;
   }
   .headerLogo {
     width: 74px;

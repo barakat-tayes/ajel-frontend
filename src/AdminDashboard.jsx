@@ -194,18 +194,25 @@ export default function AdminDashboard() {
     const link = x.location_link || (x.location_lat && x.location_lng ? `https://www.google.com/maps?q=${x.location_lat},${x.location_lng}` : "");
     if (link) window.open(link, "_blank");
   };
+  const switchView = (nextView) => {
+    setView(nextView);
+    setSidebarOpen(false);
+  };
 
   return (
     <div dir="rtl" className={styles.adminShell}>
       <aside className={`${styles.adminSidebar} ${sidebarOpen ? styles.adminSidebarOpen : ""}`}>
+        <div className={styles.sidebarHeadMobile}>
+          <button className={styles.menuBtn} onClick={() => setSidebarOpen(false)}>✕</button>
+        </div>
         <div style={{ fontWeight: 900, fontSize: 20, color: "#fff", marginBottom: 10 }}>Ajel Admin</div>
-        <button onClick={() => setView("restaurants")} className={`${styles.sidebarTab} ${view === "restaurants" ? styles.sidebarTabActive : ""}`}>التجار</button>
-        <button onClick={() => setView("drivers")} className={`${styles.sidebarTab} ${view === "drivers" ? styles.sidebarTabActive : ""}`}>السائقون</button>
-        <button onClick={() => setView("requests")} className={`${styles.sidebarTab} ${view === "requests" ? styles.sidebarTabActive : ""}`}>
+        <button onClick={() => switchView("restaurants")} className={`${styles.sidebarTab} ${view === "restaurants" ? styles.sidebarTabActive : ""}`}>التجار</button>
+        <button onClick={() => switchView("drivers")} className={`${styles.sidebarTab} ${view === "drivers" ? styles.sidebarTabActive : ""}`}>السائقون</button>
+        <button onClick={() => switchView("requests")} className={`${styles.sidebarTab} ${view === "requests" ? styles.sidebarTabActive : ""}`}>
           طلبات الانضمام
           {pendingRequests > 0 ? <span style={badgeStyle}>{pendingRequests}</span> : null}
         </button>
-        <button onClick={() => setView("settings")} className={`${styles.sidebarTab} ${view === "settings" ? styles.sidebarTabActive : ""}`}>إعدادات الأدمن</button>
+        <button onClick={() => switchView("settings")} className={`${styles.sidebarTab} ${view === "settings" ? styles.sidebarTabActive : ""}`}>إعدادات الأدمن</button>
         <div style={{ marginTop: "auto" }}>
           <button onClick={logout} className={styles.sidebarTab} style={{ width: "100%", background: "#dc2626", color: "#fff", justifyContent: "center", borderColor: "#dc2626" }}>تسجيل الخروج</button>
         </div>
@@ -213,7 +220,7 @@ export default function AdminDashboard() {
 
       <main className={styles.adminMain}>
         <div className={styles.mobileTopBar}>
-          <button className={styles.menuBtn} onClick={() => setSidebarOpen((v) => !v)}>{sidebarOpen ? "✕" : "☰"}</button>
+          {!sidebarOpen ? <button className={styles.menuBtn} onClick={() => setSidebarOpen(true)}>☰</button> : null}
           <strong>لوحة الأدمن</strong>
         </div>
         <div className={styles.stickyTop}>

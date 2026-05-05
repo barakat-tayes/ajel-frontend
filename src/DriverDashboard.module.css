@@ -149,12 +149,13 @@
 
 .availableOrderCard {
   display: block;
+  flex: 0 0 154px;
+  height: 154px;
   background: linear-gradient(180deg, #ffffff 0%, #fffaf7 100%);
   border: 1px solid #f8d9c2;
   border-radius: 14px;
   padding: 10px;
   box-shadow: 0 10px 20px rgba(2, 6, 23, 0.08);
-  min-height: 144px;
   overflow: hidden;
 }
 .availableOrderRestaurantBar {
@@ -191,14 +192,14 @@
   grid-template-columns: minmax(0, 1fr) 46px;
   align-items: stretch;
   gap: 10px;
-  min-height: 92px;
+  height: 100%;
 }
 .orderActionsColumn {
   order: 2;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 12px;
+  gap: 30px;
 }
 .availableOrderBody {
   order: 1;
@@ -207,6 +208,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 6px;
+  overflow: hidden;
 }
 .orderTopRow {
   display: grid;
@@ -219,7 +221,7 @@
   grid-template-columns: 1.5fr 1fr;
   align-items: center;
   gap: 8px;
-  margin-top: -1px;
+  margin-top: -25px;
 }
 .availableOrderBody .orderBottomRow {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -228,10 +230,12 @@
 .availableOrderBody .orderBottomRow p:first-child {
   text-align: right;
   justify-self: start;
+  font-size: 15px;
 }
 .availableOrderBody .orderBottomRow p:last-child {
   text-align: left;
   justify-self: end;
+  font-size: 15px;
 }
 .availableOrderBody .orderBottomRow .address {
   min-width: 0;
@@ -249,25 +253,32 @@
   margin-top: 6px;
 }
 .restaurantHint {
-  font-size: 0.78rem;
+  font-size: 1.2rem;
   color: #94a3b8;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 700;
+  background: #eee;
+  border-radius: 20px;
+  padding: 3px;
+  border: 1px solid #999;
 }
 .mapIconBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #1d4ed8;
+  border: 1px solid #d13333;
+  color: #ffffff;
   border-radius: 999px;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   text-decoration: none;
   font-size: 0.85rem;
+  font-weight: 900;
+  box-shadow: 0;
 }
 .restaurantMapBtn {
   width: 28px;
@@ -291,17 +302,21 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.32;
+  line-height: 3;
 }
 .deliveryFeeBadge {
- background: #fff4e6;
-    color: #9a3412;
-    border: 1px solid #fed7aa;
-    padding: 8px 10px;
-    border-radius: 523px;
-    font-size: 0.77rem;
-    font-weight: 800;
-    white-space: nowrap;
+  background: #fff4e6;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+  padding: 8px 10px;
+  border-radius: 900px;
+  font-size: 0.77rem;
+  font-weight: 800;
+  white-space: nowrap;
+  -webkit-border-radius: 900px;
+  -moz-border-radius: 900px;
+  -ms-border-radius: 900px;
+  -o-border-radius: 900px;
 }
 
 .acceptPillBtn {
@@ -436,6 +451,7 @@
   font-weight: 900;
   min-height: 50px;
   box-shadow: 0 8px 16px rgba(22, 163, 74, 0.25);
+  font-size: 1.1rem;
 }
 .cancelBtn {
   background: #fff1f2;
@@ -445,6 +461,7 @@
   padding: 11px 12px;
   font-weight: 900;
   min-height: 50px;
+  font-size: 1.1rem;
 }
 
 @media (max-width: 900px) {
@@ -483,18 +500,19 @@
     grid-template-columns: 24px 1fr;
   }
   .availableOrderCard {
-    padding: 8px;
-    min-height: 128px;
+    padding: 5px;
+    flex: 0 0 140px;
+    height: 140px;
   }
   .availableOrderContent {
     grid-template-columns: minmax(0, 1fr) 40px;
-    min-height: 84px;
+    height: 100%;
   }
   .customerNameRow {
     font-size: 0.86rem;
   }
   .acceptPillBtn {
-    width: 36px;
+    width: 100%;
     height: 36px;
     padding: 0;
   }
