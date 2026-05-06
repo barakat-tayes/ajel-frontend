@@ -29,6 +29,15 @@ const PROVINCES = [
 const DEFAULT_POLICY =
   "باستخدامك للتطبيق، أنت توافق على الالتزام بقواعد الاستخدام ودقة بيانات الطلبات. يحق للإدارة تعليق أو إيقاف الحساب عند وجود إساءة استخدام أو مستحقات غير مسددة.";
 
+const buildWhatsAppLink = (value = "") => {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith("wa.me/")) return `https://${raw}`;
+  const digits = raw.replace(/[^\d]/g, "");
+  return digits ? `https://wa.me/${digits}` : "";
+};
+
 export default function SettingsPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -56,6 +65,8 @@ export default function SettingsPage() {
   const [msg, setMsg] = useState("");
   const [locating, setLocating] = useState(false);
   const isRestaurant = user?.userType === "restaurant";
+  const contactPhone = String(adminSettings.contact_phone || "").trim();
+  const whatsappLink = buildWhatsAppLink(adminSettings.contact_whatsapp);
 
   const confirmLogout = async () => {
     const result = await Swal.fire({
@@ -546,9 +557,13 @@ export default function SettingsPage() {
             <div className={styles.payRow}>
               <span>واتساب</span>
               <a
-                href={adminSettings.contact_whatsapp || "#"}
+                href={whatsappLink || "#"}
                 target="_blank"
                 rel="noreferrer"
+                style={{
+                  pointerEvents: whatsappLink ? "auto" : "none",
+                  opacity: whatsappLink ? 1 : 0.6,
+                }}
               >
                 {adminSettings.contact_whatsapp || "-"}
               </a>
@@ -563,15 +578,23 @@ export default function SettingsPage() {
             >
               <a
                 className={styles.btn}
-                href={`tel:${adminSettings.contact_phone || ""}`}
+                href={contactPhone ? `tel:${contactPhone}` : "#"}
+                style={{
+                  pointerEvents: contactPhone ? "auto" : "none",
+                  opacity: contactPhone ? 1 : 0.6,
+                }}
               >
                 اتصال مباشر
               </a>
               <a
                 className={styles.btn}
-                href={adminSettings.contact_whatsapp || "#"}
+                href={whatsappLink || "#"}
                 target="_blank"
                 rel="noreferrer"
+                style={{
+                  pointerEvents: whatsappLink ? "auto" : "none",
+                  opacity: whatsappLink ? 1 : 0.6,
+                }}
               >
                 فتح واتساب
               </a>
