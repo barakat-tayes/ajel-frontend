@@ -84,46 +84,55 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const load = async () => {
-      if (user.userType === "admin") {
-        const settingsRes = await api.get("/admin/settings");
+      try {
+        if (user.userType === "admin") {
+          const settingsRes = await api.get("/admin/settings");
+          const s = settingsRes.data || {};
+          setAdminSettings({
+            per_order_fee: Number(s.per_order_fee || 0),
+            contact_phone: s.contact_phone || "",
+            contact_whatsapp: s.contact_whatsapp || "",
+            payment_master_card: s.payment_master_card || "",
+            payment_zain_cash: s.payment_zain_cash || "",
+            payment_asia_pay: s.payment_asia_pay || "",
+            policy_text: s.policy_text || DEFAULT_POLICY,
+          });
+          setAdminAccount((prev) => ({
+            ...prev,
+            username: s.username || prev.username || "",
+          }));
+          return;
+        }
+
+        const settingsRes = await api.get("/public/contact-payment");
         const s = settingsRes.data || {};
-        setAdminSettings({
-          per_order_fee: Number(s.per_order_fee || 0),
+        setAdminSettings((prev) => ({
+          ...prev,
           contact_phone: s.contact_phone || "",
           contact_whatsapp: s.contact_whatsapp || "",
           payment_master_card: s.payment_master_card || "",
           payment_zain_cash: s.payment_zain_cash || "",
           payment_asia_pay: s.payment_asia_pay || "",
           policy_text: s.policy_text || DEFAULT_POLICY,
-        });
-        setAdminAccount((prev) => ({
-          ...prev,
-          username: s.username || prev.username || "",
         }));
-        return;
+
+        const base =
+          user.userType === "restaurant"
+            ? "/restaurants/profile"
+            : "/drivers/profile";
+        const profileRes = await api.get(base);
+        setForm(profileRes.data || {});
+      } catch (error) {
+        const status = error?.response?.status;
+        if (status === 401 || status === 403 || status === 404) {
+          logout();
+          return;
+        }
+        setMsg("تعذر تحميل الإعدادات حالياً");
       }
-
-      const settingsRes = await api.get("/public/contact-payment");
-      const s = settingsRes.data || {};
-      setAdminSettings((prev) => ({
-        ...prev,
-        contact_phone: s.contact_phone || "",
-        contact_whatsapp: s.contact_whatsapp || "",
-        payment_master_card: s.payment_master_card || "",
-        payment_zain_cash: s.payment_zain_cash || "",
-        payment_asia_pay: s.payment_asia_pay || "",
-        policy_text: s.policy_text || DEFAULT_POLICY,
-      }));
-
-      const base =
-        user.userType === "restaurant"
-          ? "/restaurants/profile"
-          : "/drivers/profile";
-      const profileRes = await api.get(base);
-      setForm(profileRes.data || {});
     };
     load();
-  }, [user.userType]);
+  }, [user.userType, logout]);
 
   const saveProfile = async (e) => {
     e.preventDefault();

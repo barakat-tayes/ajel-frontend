@@ -24,6 +24,21 @@ const PROVINCES = [
   "السليمانية",
 ];
 
+const INITIAL_FORM_DATA = {
+  name: "",
+  owner_name: "",
+  phone: "",
+  province: "ظ†ظٹظ†ظˆظ‰",
+  address: "",
+  location_lat: "",
+  location_lng: "",
+  location_link: "",
+  vehicle_type: "",
+  vehicle_plate: "",
+  password: "",
+  confirmPassword: "",
+};
+
 export default function Register() {
   const navigate = useNavigate();
   const [accountType, setAccountType] = useState("restaurant");
@@ -44,9 +59,41 @@ export default function Register() {
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
   const [locating, setLocating] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const hasArabicChars = (value = "") =>
+    /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(
+      String(value),
+    );
+  const hasWhitespace = (value = "") => /\s/.test(String(value));
 
   const onChange = (e) =>
     setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
+
+  const resetRegisterForm = () =>
+    setFormData({
+      name: "",
+      owner_name: "",
+      phone: "",
+      province: "نينوى",
+      address: "",
+      location_lat: "",
+      location_lng: "",
+      location_link: "",
+      vehicle_type: "",
+      vehicle_plate: "",
+      password: "",
+      confirmPassword: "",
+    });
+
+  const switchAccountType = (nextType) => {
+    if (nextType === accountType) return;
+    setAccountType(nextType);
+    resetRegisterForm();
+    setError("");
+    setOk("");
+    setLocating(false);
+  };
 
   const pickCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -84,12 +131,16 @@ export default function Register() {
       setError("كلمتا المرور غير متطابقتين");
       return;
     }
+    if (hasArabicChars(formData.password) || hasWhitespace(formData.password)) {
+      setError("كلمة المرور يجب أن تكون بدون أحرف عربية وبدون فراغات");
+      return;
+    }
     if (
       accountType === "restaurant" &&
       (!String(formData.location_lat || "").trim() ||
         !String(formData.location_lng || "").trim())
     ) {
-      setError("يرجى تحديد موقع المطعم قبل التسجيل");
+      setError("يرجى تحديد الموقع  قبل التسجيل");
       return;
     }
     try {
@@ -124,7 +175,7 @@ export default function Register() {
         {ok && <div className={styles.ok}>{ok}</div>}
 
         <div className={styles.formScrollArea}>
-          <form onSubmit={submit} className={styles.form}>
+          <form key={accountType} onSubmit={submit} className={styles.form}>
             <div className={styles.accountTypeSwitch}>
               <button
                 type="button"
@@ -133,7 +184,7 @@ export default function Register() {
                     ? styles.accountTypeBtnActive
                     : ""
                 }`}
-                onClick={() => setAccountType("restaurant")}
+                onClick={() => switchAccountType("restaurant")}
               >
                 حساب تاجر
               </button>
@@ -142,7 +193,7 @@ export default function Register() {
                 className={`${styles.accountTypeBtn} ${
                   accountType === "driver" ? styles.accountTypeBtnActive : ""
                 }`}
-                onClick={() => setAccountType("driver")}
+                onClick={() => switchAccountType("driver")}
               >
                 حساب سائق
               </button>
@@ -263,22 +314,56 @@ export default function Register() {
             ) : null}
 
             <div className={styles.grid2}>
-              <input
-                name="password"
-                type="password"
-                className={styles.input}
-                placeholder="كلمة المرور"
-                onChange={onChange}
-                required
-              />
-              <input
-                name="confirmPassword"
-                type="password"
-                className={styles.input}
-                placeholder="تأكيد كلمة المرور"
-                onChange={onChange}
-                required
-              />
+              <div className={styles.passwordWrap}>
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  className={styles.input}
+                  placeholder="كلمة المرور"
+                  onChange={onChange}
+                  required
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={() => setShowPassword((v) => !v)}
+                  title={
+                    showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"
+                  }
+                  aria-label={
+                    showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"
+                  }
+                >
+                  {showPassword ? "🙈" : "👁"}
+                </button>
+              </div>
+              <div className={styles.passwordWrap}>
+                <input
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  className={styles.input}
+                  placeholder="تأكيد كلمة المرور"
+                  onChange={onChange}
+                  required
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={() => setShowConfirmPassword((v) => !v)}
+                  title={
+                    showConfirmPassword
+                      ? "إخفاء كلمة المرور"
+                      : "إظهار كلمة المرور"
+                  }
+                  aria-label={
+                    showConfirmPassword
+                      ? "إخفاء كلمة المرور"
+                      : "إظهار كلمة المرور"
+                  }
+                >
+                  {showConfirmPassword ? "🙈" : "👁"}
+                </button>
+              </div>
             </div>
 
             <button className={styles.primaryBtn}>إنشاء الحساب</button>

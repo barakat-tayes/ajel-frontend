@@ -5,9 +5,14 @@ import styles from "./Login.module.css";
 import api from "./api";
 
 export default function Login() {
-  const [credentials, setCredentials] = useState({ identifier: "", password: "", userType: "restaurant" });
+  const [credentials, setCredentials] = useState({
+    identifier: "",
+    password: "",
+    userType: "restaurant",
+  });
   const [error, setError] = useState("");
   const [forgotOpen, setForgotOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [contact, setContact] = useState({
     contact_phone: "",
     contact_whatsapp: "",
@@ -28,13 +33,23 @@ export default function Login() {
     loadContact();
   }, []);
 
+  const switchUserType = (nextType) => {
+    setCredentials({ identifier: "", password: "", userType: nextType });
+    setError("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      const user = await login(credentials.identifier, credentials.password, credentials.userType);
+      const user = await login(
+        credentials.identifier,
+        credentials.password,
+        credentials.userType,
+      );
       if (user.userType === "admin") navigate("/admin", { replace: true });
-      else if (user.userType === "restaurant") navigate("/restaurant", { replace: true });
+      else if (user.userType === "restaurant")
+        navigate("/restaurant", { replace: true });
       else navigate("/driver", { replace: true });
     } catch (err) {
       setError(err?.message || "حدث خطأ أثناء تسجيل الدخول");
@@ -45,13 +60,21 @@ export default function Login() {
     <div className={styles.authPage} dir="rtl">
       <div className={styles.card}>
         <div className={styles.logoWrap}>
-          <img src="/icon-512.png" alt="Ajel Logo" className={styles.logoImage} />
+          <img
+            src="/icon-512.png"
+            alt="Ajel Logo"
+            className={styles.logoImage}
+          />
           <h2 className={styles.title}>تسجيل الدخول</h2>
           <p className={styles.subtitle}>نفس حسابك.. أسرع وصول للطلبات</p>
         </div>
         {error && <div className={styles.error}>{error}</div>}
         <form onSubmit={handleSubmit} className={styles.form}>
-          <select className={styles.input} value={credentials.userType} onChange={(e) => setCredentials({ ...credentials, userType: e.target.value })}>
+          <select
+            className={styles.input}
+            value={credentials.userType}
+            onChange={(e) => switchUserType(e.target.value)}
+          >
             <option value="restaurant">تاجر</option>
             <option value="driver">سائق توصيل</option>
           </select>
@@ -59,42 +82,110 @@ export default function Login() {
             className={styles.input}
             placeholder="رقم الهاتف"
             value={credentials.identifier}
-            onChange={(e) => setCredentials({ ...credentials, identifier: e.target.value })}
+            onChange={(e) =>
+              setCredentials({ ...credentials, identifier: e.target.value })
+            }
             required
           />
-          <input
-            type="password"
-            className={styles.input}
-            placeholder="كلمة المرور"
-            value={credentials.password}
-            onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-            required
-          />
-          <button type="submit" className={styles.primaryBtn}>دخول</button>
+          <div className={styles.passwordWrap}>
+            <input
+              type={showPassword ? "text" : "password"}
+              className={styles.input}
+              placeholder="كلمة المرور"
+              value={credentials.password}
+              onChange={(e) =>
+                setCredentials({ ...credentials, password: e.target.value })
+              }
+              required
+            />
+            <button
+              type="button"
+              className={styles.passwordToggle}
+              onClick={() => setShowPassword((v) => !v)}
+              title={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+              aria-label={
+                showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"
+              }
+            >
+              {showPassword ? "🙈" : "👁"}
+            </button>
+          </div>
+          <button type="submit" className={styles.primaryBtn}>
+            دخول
+          </button>
         </form>
         <div className={styles.linkRow}>
-          <button type="button" className={styles.linkButton} onClick={() => { setForgotOpen(true); setError(""); }}>
+          <button
+            type="button"
+            className={styles.linkButton}
+            onClick={() => {
+              setForgotOpen(true);
+              setError("");
+            }}
+          >
             نسيت كلمة المرور؟
           </button>
         </div>
-        <div className={styles.linkRow}>ليس لديك حساب؟ <Link to="/register" className={styles.link}>سجل الآن</Link></div>
+        <div className={styles.linkRow}>
+          ليس لديك حساب؟{" "}
+          <Link to="/register" className={styles.link}>
+            سجل الآن
+          </Link>
+        </div>
       </div>
 
       {forgotOpen && (
-        <div className={styles.modalOverlay} onClick={() => setForgotOpen(false)}>
-          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.title} style={{ fontSize: 24, marginTop: 0 }}>نسيت كلمة المرور</h3>
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setForgotOpen(false)}
+        >
+          <div
+            className={styles.modalCard}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className={styles.title} style={{ fontSize: 24, marginTop: 0 }}>
+              نسيت كلمة المرور
+            </h3>
             <div className={styles.form}>
               <div className={styles.ok} style={{ marginBottom: 0 }}>
-                في حال نسيان كلمة المرور، تواصل مع إدارة التطبيق لإعادة تعيين كلمة مرور مؤقتة.
+                في حال نسيان كلمة المرور، تواصل مع إدارة التطبيق لإعادة تعيين
+                كلمة مرور مؤقتة.
               </div>
               <div className={styles.linkRow}>
-                رقم الدعم: {contact.contact_phone ? <a className={styles.link} href={`tel:${contact.contact_phone}`}>{contact.contact_phone}</a> : "-"}
+                رقم الدعم:{" "}
+                {contact.contact_phone ? (
+                  <a
+                    className={styles.link}
+                    href={`tel:${contact.contact_phone}`}
+                  >
+                    {contact.contact_phone}
+                  </a>
+                ) : (
+                  "-"
+                )}
               </div>
               <div className={styles.linkRow}>
-                واتساب: {contact.contact_whatsapp ? <a className={styles.link} href={contact.contact_whatsapp} target="_blank" rel="noreferrer">راسل الإدارة</a> : "-"}
+                واتساب:{" "}
+                {contact.contact_whatsapp ? (
+                  <a
+                    className={styles.link}
+                    href={contact.contact_whatsapp}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    راسل الإدارة
+                  </a>
+                ) : (
+                  "-"
+                )}
               </div>
-              <button className={styles.primaryBtn} type="button" onClick={() => setForgotOpen(false)}>إغلاق</button>
+              <button
+                className={styles.primaryBtn}
+                type="button"
+                onClick={() => setForgotOpen(false)}
+              >
+                إغلاق
+              </button>
             </div>
           </div>
         </div>

@@ -1,5 +1,10 @@
 ﻿import "./App.css";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./AuthContext.jsx";
 import Login from "./Login.jsx";
 import Register from "./Register.jsx";
@@ -12,13 +17,16 @@ import ContactPage from "./ContactPage.jsx";
 import RestaurantSuspendedPage from "./RestaurantSuspendedPage.jsx";
 import DriverSuspendedPage from "./DriverSuspendedPage.jsx";
 import { useEffect, useState } from "react";
+import io from "socket.io-client";
+import { SOCKET_BASE_URL } from "./runtimeConfig";
 
 function Guard({ role, children }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   if (role && user.userType !== role) {
     if (user.userType === "admin") return <Navigate to="/admin" replace />;
-    if (user.userType === "restaurant") return <Navigate to="/restaurant" replace />;
+    if (user.userType === "restaurant")
+      return <Navigate to="/restaurant" replace />;
     return <Navigate to="/driver" replace />;
   }
   return children;
@@ -28,7 +36,8 @@ function RootRedirect() {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   if (user.userType === "admin") return <Navigate to="/admin" replace />;
-  if (user.userType === "restaurant") return <Navigate to="/restaurant" replace />;
+  if (user.userType === "restaurant")
+    return <Navigate to="/restaurant" replace />;
   return <Navigate to="/driver" replace />;
 }
 
@@ -36,7 +45,8 @@ function PublicOnly({ children }) {
   const { user } = useAuth();
   if (!user) return children;
   if (user.userType === "admin") return <Navigate to="/admin" replace />;
-  if (user.userType === "restaurant") return <Navigate to="/restaurant" replace />;
+  if (user.userType === "restaurant")
+    return <Navigate to="/restaurant" replace />;
   return <Navigate to="/driver" replace />;
 }
 
@@ -51,7 +61,9 @@ function InstallPromptBar() {
     }
   });
   const ua = window.navigator.userAgent || "";
-  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const isIOS =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
   const isIOSSafari = isIOS && isSafari;
 
@@ -114,7 +126,8 @@ function InstallPromptBar() {
     return (
       <div style={barStyle}>
         <span style={textStyle}>
-          لتثبيت التطبيق على iPhone: اضغط زر المشاركة في Safari ثم اختر اضافة الى الشاشة الرئيسية
+          لتثبيت التطبيق على iPhone: اضغط زر المشاركة في Safari ثم اختر اضافة
+          الى الشاشة الرئيسية
         </span>
       </div>
     );
@@ -126,7 +139,15 @@ function InstallPromptBar() {
     <div style={barStyle}>
       <span style={textStyle}>ثبّت تطبيق عاجل على جهازك لتجربة أسرع</span>
       <button
-        style={{ background: "#e31e24", color: "#fff", border: 0, borderRadius: 8, padding: isSmallScreen ? "7px 10px" : "8px 12px", fontWeight: 800, fontSize: isSmallScreen ? "12px" : "14px" }}
+        style={{
+          background: "#e31e24",
+          color: "#fff",
+          border: 0,
+          borderRadius: 8,
+          padding: isSmallScreen ? "7px 10px" : "8px 12px",
+          fontWeight: 800,
+          fontSize: isSmallScreen ? "12px" : "14px",
+        }}
         onClick={async () => {
           try {
             if (deferredPrompt && typeof deferredPrompt.prompt === "function") {
@@ -160,6 +181,56 @@ function SplashScreen() {
   );
 }
 
+function SessionSocketBridge() {
+  const { user, logout } = useAuth();
+
+  useEffect(() => {
+    if (!user?.id || !user?.userType) return undefined;
+    const s = io(SOCKET_BASE_URL);
+    s.emit("join", {
+      userType: user.userType,
+      userId: user.id,
+      province: user.province || undefined,
+    });
+    s.on("account_deleted", () => logout());
+    return () => s.close();
+  }, [user?.id, user?.userType, user?.province, logout]);
+
+  return null;
+}
+
+function OfflineOverlay() {
+  const [isOffline, setIsOffline] = useState(() =>
+    typeof navigator !== "undefined" ? !navigator.onLine : false,
+  );
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    const onOnline = () => setIsOffline(false);
+    const onOffline = () => setIsOffline(true);
+    const onPending = (e) => setPendingCount(Number(e?.detail?.count || 0));
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    window.addEventListener("api:pending", onPending);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+      window.removeEventListener("api:pending", onPending);
+    };
+  }, []);
+
+  if (!(isOffline && pendingCount > 0)) return null;
+  return (
+    <div className="offlineOverlay" dir="rtl">
+      <div className="offlineCard">
+        <span className="loader" />
+        <div className="offlineTitle">لا يوجد اتصال بالإنترنت</div>
+        <div className="offlineSub">بانتظار عودة الشبكة...</div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
 
@@ -169,8 +240,35 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const suppressNetworkOverlay = (message) =>
+      /Failed to fetch|NetworkError|Load failed|load faild/i.test(
+        String(message || ""),
+      );
+    const onUnhandledRejection = (event) => {
+      const msg = event?.reason?.message || event?.reason;
+      if (suppressNetworkOverlay(msg)) event.preventDefault();
+    };
+    const onGlobalError = (event) => {
+      const msg = event?.message || "";
+      if (suppressNetworkOverlay(msg)) {
+        event.preventDefault();
+        return false;
+      }
+      return undefined;
+    };
+    window.addEventListener("unhandledrejection", onUnhandledRejection);
+    window.addEventListener("error", onGlobalError);
+    return () => {
+      window.removeEventListener("unhandledrejection", onUnhandledRejection);
+      window.removeEventListener("error", onGlobalError);
+    };
+  }, []);
+
+  useEffect(() => {
     const ua = window.navigator.userAgent || "";
-    const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const isIOS =
+      /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
     const isIOSSafari = isIOS && isSafari;
     if (!isIOSSafari) return undefined;
@@ -226,9 +324,13 @@ export default function App() {
       const absDy = Math.abs(dy);
       const nearLeftEdge = startX <= EDGE;
       const nearRightEdge = startX >= window.innerWidth - EDGE;
-      const horizontalGesture = absDx > SWIPE_DISTANCE && absDy < VERTICAL_TOLERANCE;
+      const horizontalGesture =
+        absDx > SWIPE_DISTANCE && absDy < VERTICAL_TOLERANCE;
 
-      if (horizontalGesture && ((nearLeftEdge && dx > 0) || (nearRightEdge && dx < 0))) {
+      if (
+        horizontalGesture &&
+        ((nearLeftEdge && dx > 0) || (nearRightEdge && dx < 0))
+      ) {
         e.preventDefault();
       }
     };
@@ -244,19 +346,91 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
+        <SessionSocketBridge />
+        <OfflineOverlay />
         {showSplash ? <SplashScreen /> : null}
         <InstallPromptBar />
         <Routes>
-          <Route path="/login" element={<PublicOnly><Login /></PublicOnly>} />
-          <Route path="/register" element={<PublicOnly><Register /></PublicOnly>} />
-          <Route path="/restaurant" element={<Guard role="restaurant"><RestaurantDashboard /></Guard>} />
-          <Route path="/restaurant-suspended" element={<Guard role="restaurant"><RestaurantSuspendedPage /></Guard>} />
-          <Route path="/driver" element={<Guard role="driver"><DriverDashboard /></Guard>} />
-          <Route path="/driver-suspended" element={<Guard role="driver"><DriverSuspendedPage /></Guard>} />
-          <Route path="/admin" element={<Guard role="admin"><AdminDashboard /></Guard>} />
-          <Route path="/settings" element={<Guard><SettingsPage /></Guard>} />
-          <Route path="/about-policy" element={<Guard><AboutPolicyPage /></Guard>} />
-          <Route path="/contact" element={<Guard><ContactPage /></Guard>} />
+          <Route
+            path="/login"
+            element={
+              <PublicOnly>
+                <Login />
+              </PublicOnly>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicOnly>
+                <Register />
+              </PublicOnly>
+            }
+          />
+          <Route
+            path="/restaurant"
+            element={
+              <Guard role="restaurant">
+                <RestaurantDashboard />
+              </Guard>
+            }
+          />
+          <Route
+            path="/restaurant-suspended"
+            element={
+              <Guard role="restaurant">
+                <RestaurantSuspendedPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/driver"
+            element={
+              <Guard role="driver">
+                <DriverDashboard />
+              </Guard>
+            }
+          />
+          <Route
+            path="/driver-suspended"
+            element={
+              <Guard role="driver">
+                <DriverSuspendedPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <Guard role="admin">
+                <AdminDashboard />
+              </Guard>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <Guard>
+                <SettingsPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/about-policy"
+            element={
+              <Guard>
+                <AboutPolicyPage />
+              </Guard>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <Guard>
+                <ContactPage />
+              </Guard>
+            }
+          />
           <Route path="/" element={<RootRedirect />} />
           <Route path="*" element={<RootRedirect />} />
         </Routes>

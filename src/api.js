@@ -1,6 +1,12 @@
 import { API_BASE_URL } from "./runtimeConfig";
 
 let refreshPromise = null;
+let inFlightRequests = 0;
+const emitPending = () => {
+  window.dispatchEvent(
+    new CustomEvent("api:pending", { detail: { count: inFlightRequests } }),
+  );
+};
 
 const tryRefreshToken = async () => {
   if (refreshPromise) return refreshPromise;
@@ -47,38 +53,59 @@ const apiFetch = async (url, options = {}, isRetry = false) => {
     body = JSON.stringify(body);
   }
 
-  const response = await fetch(`${API_BASE_URL}${url}`, {
-    ...options,
-    method,
-    headers,
-    body,
-    credentials: "include",
-  });
+  inFlightRequests += 1;
+  emitPending();
+  try {
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      ...options,
+      method,
+      headers,
+      body,
+      credentials: "include",
+    });
 
-  const contentType = response.headers.get("content-type") || "";
-  const isJson = contentType.includes("application/json");
-  const data = isJson ? await response.json() : await response.text();
+    const contentType = response.headers.get("content-type") || "";
+    const isJson = contentType.includes("application/json");
+    const data = isJson ? await response.json() : await response.text();
 
-  if (!response.ok) {
-    const isAuthEndpoint =
-      url.startsWith("/auth/login") || url.startsWith("/auth/refresh");
-    if (response.status === 401 && !isRetry && !isAuthEndpoint) {
-      try {
-        await tryRefreshToken();
-        return apiFetch(url, options, true);
-      } catch {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        if (window.location.pathname !== "/login")
-          window.location.href = "/login";
+    if (!response.ok) {
+      const isAuthEndpoint =
+        url.startsWith("/auth/login") || url.startsWith("/auth/refresh");
+      if (response.status === 401 && !isRetry && !isAuthEndpoint) {
+        try {
+          await tryRefreshToken();
+          return apiFetch(url, options, true);
+        } catch {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          if (window.location.pathname !== "/login")
+            window.location.href = "/login";
+        }
       }
+      const err = new Error((data && data.error) || data || "Request failed");
+      err.response = { data, status: response.status };
+      throw err;
     }
-    const err = new Error((data && data.error) || data || "Request failed");
-    err.response = { data, status: response.status };
-    throw err;
-  }
 
-  return { data, status: response.status };
+    return { data, status: response.status };
+  } catch (error) {
+    const isNetworkError =
+      error instanceof TypeError ||
+      /Failed to fetch|NetworkError|Load failed|load faild/i.test(
+        String(error?.message || ""),
+      );
+    if (isNetworkError) {
+      window.dispatchEvent(
+        new CustomEvent("api:network-failure", {
+          detail: { at: Date.now(), message: String(error?.message || "") },
+        }),
+      );
+    }
+    throw error;
+  } finally {
+    inFlightRequests = Math.max(0, inFlightRequests - 1);
+    emitPending();
+  }
 };
 
 const syncPending = async () => ({ synced: 0, left: 0 });

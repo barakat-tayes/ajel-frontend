@@ -2,7 +2,12 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: radial-gradient(circle at 50% 20%, #ffd766 0%, #ffb800 48%, #f39200 100%);
+  background: radial-gradient(
+    circle at 50% 20%,
+    #ffd766 0%,
+    #ffb800 48%,
+    #f39200 100%
+  );
   display: grid;
   place-items: center;
   animation: splashFadeOut 1.5s ease forwards;
@@ -50,7 +55,8 @@
 }
 
 @keyframes splashFadeOut {
-  0%, 72% {
+  0%,
+  72% {
     opacity: 1;
     visibility: visible;
   }
@@ -61,9 +67,78 @@
 }
 
 @media (min-width: 768px) {
-  .splashLogoRing { width: 154px; height: 154px; border-radius: 24px; }
+  .splashLogoRing {
+    width: 154px;
+    height: 154px;
+    border-radius: 24px;
+  }
 }
 
 @media (min-width: 1024px) {
-  .splashLogoRing { width: 172px; height: 172px; border-radius: 26px; }
+  .splashLogoRing {
+    width: 172px;
+    height: 172px;
+    border-radius: 26px;
+  }
+}
+
+.offlineOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  background: rgba(15, 23, 42, 0.82);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.offlineCard {
+  width: min(92vw, 340px);
+  border-radius: 16px;
+  background: rgba(17, 24, 39, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 22px 16px;
+  color: #fff;
+  text-align: center;
+}
+
+.offlineTitle {
+  margin-top: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.offlineSub {
+  margin-top: 8px;
+  font-size: 0.88rem;
+  color: #cbd5e1;
+}
+
+.loader,
+.loader:before {
+  display: inline-block;
+  border: 20px double transparent;
+  border-top-color: #fff;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.loader {
+  padding: 8px;
+  animation: wifiLoading 1s ease-in infinite;
+}
+
+.loader:before {
+  content: "";
+  width: 0;
+  height: 0;
+}
+
+@keyframes wifiLoading {
+  0% {
+    border-style: none;
+  }
+  100% {
+    border-style: double;
+  }
 }
