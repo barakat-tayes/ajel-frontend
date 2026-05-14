@@ -142,3 +142,37 @@
     border-style: double;
   }
 }
+
+.installBannerPulse {
+  animation: installBannerBounce 1.35s cubic-bezier(0.22, 0.61, 0.36, 1)
+    infinite;
+  transform-origin: center;
+  will-change: transform, box-shadow;
+}
+
+@keyframes installBannerBounce {
+  0% {
+    transform: translateY(0);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+  }
+  18% {
+    transform: translateY(-100%);
+    box-shadow: 0 18px 30px rgba(15, 23, 42, 0.33);
+  }
+  38% {
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+  }
+  52% {
+    transform: translateY(-25%);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.28);
+  }
+  68% {
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+  }
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+  }
+}

@@ -97,7 +97,7 @@ function InstallPromptBar() {
     };
   }, []);
 
-  if (!user || installed) return null;
+  if (installed) return null;
 
   const isSmallScreen = window.innerWidth <= 520;
   const barStyle = {
@@ -106,7 +106,7 @@ function InstallPromptBar() {
     right: 10,
     bottom: 10,
     zIndex: 9999,
-    background: "#111",
+    background: "#1f2937",
     color: "#fff",
     padding: isSmallScreen ? "8px 10px" : "10px 12px",
     borderRadius: 12,
@@ -124,7 +124,7 @@ function InstallPromptBar() {
 
   if (isIOSSafari) {
     return (
-      <div style={barStyle}>
+      <div style={barStyle} className="installBannerPulse">
         <span style={textStyle}>
           لتثبيت التطبيق على iPhone: اضغط زر المشاركة في Safari ثم اختر اضافة
           الى الشاشة الرئيسية
@@ -136,7 +136,7 @@ function InstallPromptBar() {
   if (!deferredPrompt) return null;
 
   return (
-    <div style={barStyle}>
+    <div style={barStyle} className="installBannerPulse">
       <span style={textStyle}>ثبّت تطبيق عاجل على جهازك لتجربة أسرع</span>
       <button
         style={{
