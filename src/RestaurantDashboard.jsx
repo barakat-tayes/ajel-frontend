@@ -8,9 +8,12 @@ import styles from "./RestaurantDashboard.module.css";
 import { SOCKET_BASE_URL } from "./runtimeConfig";
 
 const toLocalDate = (d = new Date()) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate(),
+  ).padStart(2, "0")}`;
 const today = toLocalDate(new Date());
-const asIqd = (value) => `${Math.round(Number(value || 0)).toLocaleString("en-US")} د.ع`;
+const asIqd = (value) =>
+  `${Math.round(Number(value || 0)).toLocaleString("en-US")} د.ع`;
 const asTime = (value) => {
   if (!value) return "-";
   const d = new Date(value);
@@ -26,10 +29,16 @@ export default function RestaurantDashboard() {
   const [pendingLiveOrders, setPendingLiveOrders] = useState([]);
   const [tracking, setTracking] = useState([]);
   const [tab, setTab] = useState("new");
-  const [filters, setFilters] = useState({ start_date: today, end_date: today });
+  const [filters, setFilters] = useState({
+    start_date: today,
+    end_date: today,
+  });
   const [quickRange, setQuickRange] = useState("today");
   const [warningBar, setWarningBar] = useState("");
-  const [dueSummary, setDueSummary] = useState({ due_amount: 0, completed_count: 0 });
+  const [dueSummary, setDueSummary] = useState({
+    due_amount: 0,
+    completed_count: 0,
+  });
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
   const [networkError, setNetworkError] = useState("");
   const [form, setForm] = useState({
@@ -77,7 +86,7 @@ export default function RestaurantDashboard() {
     setWarningBar(
       p?.data?.suspension_warning_at
         ? "تحذير من الإدارة: قد يتم غلق الحساب لعدم تسديد المستحقات"
-        : ""
+        : "",
     );
   };
 
@@ -85,9 +94,16 @@ export default function RestaurantDashboard() {
     const run = async () => {
       try {
         setNetworkError("");
-        await Promise.all([loadOrders(), loadTracking(), loadDueSummary(), loadProfileFlags()]);
+        await Promise.all([
+          loadOrders(),
+          loadTracking(),
+          loadDueSummary(),
+          loadProfileFlags(),
+        ]);
       } catch (e) {
-        setNetworkError("تعذر الاتصال بالخادم مؤقتًا. سيتم إعادة المحاولة تلقائيًا.");
+        setNetworkError(
+          "تعذر الاتصال بالخادم مؤقتًا. سيتم إعادة المحاولة تلقائيًا.",
+        );
       }
     };
     run();
@@ -97,7 +113,12 @@ export default function RestaurantDashboard() {
     if (!networkError) return undefined;
     const t = setTimeout(async () => {
       try {
-        await Promise.all([loadOrders(), loadTracking(), loadDueSummary(), loadProfileFlags()]);
+        await Promise.all([
+          loadOrders(),
+          loadTracking(),
+          loadDueSummary(),
+          loadProfileFlags(),
+        ]);
         setNetworkError("");
       } catch {}
     }, 2500);
@@ -112,7 +133,12 @@ export default function RestaurantDashboard() {
       await Promise.all([loadOrders(), loadTracking(), loadDueSummary()]);
       showOrderAcceptedToast(payload);
     });
-    ["order_picked_up", "order_delivered", "order_returned", "new_order"].forEach((evt) => {
+    [
+      "order_picked_up",
+      "order_delivered",
+      "order_returned",
+      "new_order",
+    ].forEach((evt) => {
       s.on(evt, () => {
         loadOrders();
         loadTracking();
@@ -128,7 +154,10 @@ export default function RestaurantDashboard() {
       });
     });
     s.on("admin_suspension_warning", (payload) => {
-      setWarningBar(payload?.message || "تحذير من الإدارة: قد يتم غلق الحساب لعدم تسديد المستحقات");
+      setWarningBar(
+        payload?.message ||
+          "تحذير من الإدارة: قد يتم غلق الحساب لعدم تسديد المستحقات",
+      );
     });
     s.on("admin_clear_warnings", () => {
       setWarningBar("");
@@ -157,7 +186,11 @@ export default function RestaurantDashboard() {
     setIsSubmittingOrder(true);
     try {
       await api.post("/orders", form);
-      await Swal.fire({ icon: "success", title: "تم إرسال الطلبية", confirmButtonColor: "#e31e24" });
+      await Swal.fire({
+        icon: "success",
+        title: "تم إرسال الطلبية",
+        confirmButtonColor: "#e31e24",
+      });
       setForm({
         customer_name: "",
         customer_phone: "",
@@ -185,7 +218,11 @@ export default function RestaurantDashboard() {
     });
     if (!r.isConfirmed) return;
     await api.delete(`/restaurants/orders/${id}`);
-    await Swal.fire({ icon: "success", title: "تم إلغاء الطلبية", confirmButtonColor: "#e31e24" });
+    await Swal.fire({
+      icon: "success",
+      title: "تم إلغاء الطلبية",
+      confirmButtonColor: "#e31e24",
+    });
     await loadOrders();
     await loadDueSummary();
   };
@@ -204,7 +241,11 @@ export default function RestaurantDashboard() {
           <div><b>المركبة:</b> ${order?.vehicle_type || "-"}</div>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px">
             <span><b>الهاتف:</b> ${phone || "-"}</span>
-            ${tel ? `<a href="${tel}" style="background:#16a34a;color:#fff;text-decoration:none;padding:7px 10px;border-radius:8px;font-weight:700">📞 اتصال</a>` : ""}
+            ${
+              tel
+                ? `<a href="${tel}" style="background:#16a34a;color:#fff;text-decoration:none;padding:7px 10px;border-radius:8px;font-weight:700">📞 اتصال</a>`
+                : ""
+            }
           </div>
         </div>
       `,
@@ -250,10 +291,20 @@ export default function RestaurantDashboard() {
   };
 
   const pendingOrders = useMemo(() => pendingLiveOrders, [pendingLiveOrders]);
-  const activeOrders = useMemo(() => orders.filter((o) => ["accepted", "picked_up"].includes(o.status)), [orders]);
-  const completedOrders = useMemo(() => orders.filter((o) => o.status === "delivered"), [orders]);
-  const returnedOrders = useMemo(() => orders.filter((o) => o.status === "returned"), [orders]);
-  const sumAmounts = (arr) => arr.reduce((acc, o) => acc + Number(o?.order_amount || 0), 0);
+  const activeOrders = useMemo(
+    () => orders.filter((o) => ["accepted", "picked_up"].includes(o.status)),
+    [orders],
+  );
+  const completedOrders = useMemo(
+    () => orders.filter((o) => o.status === "delivered"),
+    [orders],
+  );
+  const returnedOrders = useMemo(
+    () => orders.filter((o) => o.status === "returned"),
+    [orders],
+  );
+  const sumAmounts = (arr) =>
+    arr.reduce((acc, o) => acc + Number(o?.order_amount || 0), 0);
 
   const stats = useMemo(
     () => ({
@@ -266,73 +317,236 @@ export default function RestaurantDashboard() {
       returnedCount: returnedOrders.length,
       returnedAmount: sumAmounts(returnedOrders),
     }),
-    [pendingOrders, activeOrders, completedOrders, returnedOrders]
+    [pendingOrders, activeOrders, completedOrders, returnedOrders],
   );
 
-  const viewOrders = tab === "pending" ? pendingOrders : tab === "active" ? tracking : completedOrders;
+  const viewOrders =
+    tab === "pending"
+      ? pendingOrders
+      : tab === "active"
+      ? tracking
+      : completedOrders;
 
   return (
     <div className={styles.restaurantDashboardContainer} dir="rtl">
       <div className={styles.pageShell}>
         <div className={styles.dashboardHeader}>
           <div className={styles.headerSideRight}>
-            <img src="/icon-512.png" alt="Ajel Logo" className={styles.headerLogo} />
+            <img
+              src="/icon-512.png"
+              alt="Ajel Logo"
+              className={styles.headerLogo}
+            />
           </div>
           <h1 className={styles.headerCenterTitle}>{user?.name}</h1>
           <div className={styles.headerSideLeft}>
-            <button onClick={() => navigate("/settings")} className={styles.logoutButton}>⚙</button>
+            <button
+              onClick={() => navigate("/settings")}
+              className={styles.logoutButton}
+            >
+              ⚙
+            </button>
           </div>
         </div>
 
         {networkError ? (
-          <div className={styles.warningBar} style={{ background: "#fff1f2", color: "#b91c1c", border: "1px solid #fecdd3" }}>
+          <div
+            className={styles.warningBar}
+            style={{
+              background: "#fff1f2",
+              color: "#b91c1c",
+              border: "1px solid #fecdd3",
+            }}
+          >
             {networkError}
           </div>
         ) : null}
-        {warningBar ? <div className={styles.warningBar}>{warningBar}</div> : null}
+        {warningBar ? (
+          <div className={styles.warningBar}>{warningBar}</div>
+        ) : null}
 
         <div className={styles.summaryGrid}>
-          <div className={styles.summaryCard}><div className={styles.summaryLabel}>معلقة</div><div className={styles.summaryValue}>{stats.pendingCount}</div><div className={styles.summaryAmount}>{asIqd(stats.pendingAmount)}</div></div>
-          <div className={styles.summaryCard}><div className={styles.summaryLabel}>نشطة</div><div className={styles.summaryValue}>{stats.activeCount}</div><div className={styles.summaryAmount}>{asIqd(stats.activeAmount)}</div></div>
-          <div className={styles.summaryCard}><div className={styles.summaryLabel}>مكتملة</div><div className={styles.summaryValue}>{stats.completedCount}</div><div className={styles.summaryAmount}>{asIqd(stats.completedAmount)}</div></div>
-          <div className={styles.summaryCard}><div className={styles.summaryLabel}>راجعة</div><div className={styles.summaryValue}>{stats.returnedCount}</div><div className={styles.summaryAmount}>{asIqd(stats.returnedAmount)}</div></div>
-          <div className={styles.summaryCard}><div className={styles.summaryLabel}>المستحق</div><div className={styles.summaryValue}>{dueSummary.completed_count || 0}</div><div className={styles.summaryAmount}>{asIqd(dueSummary.due_amount || 0)}</div></div>
+          <div className={styles.summaryCard}>
+            <div className={styles.summaryLabel}>معلقة</div>
+            <div className={styles.summaryValue}>{stats.pendingCount}</div>
+            <div className={styles.summaryAmount}>
+              {asIqd(stats.pendingAmount)}
+            </div>
+          </div>
+          <div className={styles.summaryCard}>
+            <div className={styles.summaryLabel}>نشطة</div>
+            <div className={styles.summaryValue}>{stats.activeCount}</div>
+            <div className={styles.summaryAmount}>
+              {asIqd(stats.activeAmount)}
+            </div>
+          </div>
+          <div className={styles.summaryCard}>
+            <div className={styles.summaryLabel}>مكتملة</div>
+            <div className={styles.summaryValue}>{stats.completedCount}</div>
+            <div className={styles.summaryAmount}>
+              {asIqd(stats.completedAmount)}
+            </div>
+          </div>
+          <div className={styles.summaryCard}>
+            <div className={styles.summaryLabel}>راجعة</div>
+            <div className={styles.summaryValue}>{stats.returnedCount}</div>
+            <div className={styles.summaryAmount}>
+              {asIqd(stats.returnedAmount)}
+            </div>
+          </div>
+          <div className={styles.summaryCard}>
+            <div className={styles.summaryLabel}>المستحق</div>
+            <div className={styles.summaryValue}>
+              {dueSummary.completed_count || 0}
+            </div>
+            <div className={styles.summaryAmount}>
+              {asIqd(dueSummary.due_amount || 0)}
+            </div>
+          </div>
         </div>
 
         <div className={styles.dateRangeWrap}>
-          <input className={styles.formInput} type="date" value={filters.start_date} onChange={(e) => setFilters({ ...filters, start_date: e.target.value || today })} />
-          <input className={styles.formInput} type="date" value={filters.end_date} onChange={(e) => setFilters({ ...filters, end_date: e.target.value || today })} />
+          <input
+            className={styles.formInput}
+            type="date"
+            value={filters.start_date}
+            onChange={(e) =>
+              setFilters({ ...filters, start_date: e.target.value || today })
+            }
+          />
+          <input
+            className={styles.formInput}
+            type="date"
+            value={filters.end_date}
+            onChange={(e) =>
+              setFilters({ ...filters, end_date: e.target.value || today })
+            }
+          />
         </div>
         <div className={styles.quickRow}>
-          {[["today", "اليوم"], ["week", "الأسبوع"], ["month", "الشهر"], ["year", "السنة"]].map(([k, l]) => (
-            <button key={k} className={`${styles.quickBtn} ${quickRange === k ? styles.quickBtnActive : ""}`} onClick={() => applyQuickRange(k)}>{l}</button>
+          {[
+            ["today", "اليوم"],
+            ["week", "الأسبوع"],
+            ["month", "الشهر"],
+            ["year", "السنة"],
+          ].map(([k, l]) => (
+            <button
+              key={k}
+              className={`${styles.quickBtn} ${
+                quickRange === k ? styles.quickBtnActive : ""
+              }`}
+              onClick={() => applyQuickRange(k)}
+            >
+              {l}
+            </button>
           ))}
         </div>
 
         <div className={styles.tabsContainer}>
-          <button onClick={() => setTab("new")} className={`${styles.tabButton} ${tab === "new" ? styles.tabButtonActive : ""}`}>إضافة طلب</button>
-          <button onClick={() => setTab("pending")} className={`${styles.tabButton} ${tab === "pending" ? styles.tabButtonActive : ""}`}>معلقة</button>
-          <button onClick={() => setTab("active")} className={`${styles.tabButton} ${tab === "active" ? styles.tabButtonActive : ""}`}>نشطة</button>
-          <button onClick={() => setTab("completed")} className={`${styles.tabButton} ${tab === "completed" ? styles.tabButtonActive : ""}`}>مكتملة</button>
+          <button
+            onClick={() => setTab("new")}
+            className={`${styles.tabButton} ${
+              tab === "new" ? styles.tabButtonActive : ""
+            }`}
+          >
+            إضافة طلب
+          </button>
+          <button
+            onClick={() => setTab("pending")}
+            className={`${styles.tabButton} ${
+              tab === "pending" ? styles.tabButtonActive : ""
+            }`}
+          >
+            معلقة
+          </button>
+          <button
+            onClick={() => setTab("active")}
+            className={`${styles.tabButton} ${
+              tab === "active" ? styles.tabButtonActive : ""
+            }`}
+          >
+            نشطة
+          </button>
+          <button
+            onClick={() => setTab("completed")}
+            className={`${styles.tabButton} ${
+              tab === "completed" ? styles.tabButtonActive : ""
+            }`}
+          >
+            مكتملة
+          </button>
         </div>
 
         {tab === "new" && (
           <form onSubmit={submit} className={styles.orderFormCard}>
             <div className={styles.filterRow}>
-              <input className={styles.formInput} placeholder="اسم الزبون" value={form.customer_name} onChange={(e) => setForm({ ...form, customer_name: e.target.value })} required />
-              <input className={styles.formInput} placeholder="رقم الزبون" value={form.customer_phone} onChange={(e) => setForm({ ...form, customer_phone: e.target.value })} required />
+              <input
+                className={styles.formInput}
+                placeholder="اسم الزبون"
+                value={form.customer_name}
+                onChange={(e) =>
+                  setForm({ ...form, customer_name: e.target.value })
+                }
+                required
+              />
+              <input
+                className={styles.formInput}
+                placeholder="رقم الزبون"
+                value={form.customer_phone}
+                onChange={(e) =>
+                  setForm({ ...form, customer_phone: e.target.value })
+                }
+                required
+              />
             </div>
-            <input className={styles.formInput} placeholder="العنوان الدقيق" value={form.customer_address} onChange={(e) => setForm({ ...form, customer_address: e.target.value })} required />
+            <input
+              className={styles.formInput}
+              placeholder="العنوان الدقيق"
+              value={form.customer_address}
+              onChange={(e) =>
+                setForm({ ...form, customer_address: e.target.value })
+              }
+              required
+            />
             <div className={styles.filterRow}>
-              <input className={styles.formInput} placeholder="نوع الطلب (مثال: دجاج)" value={form.order_type} onChange={(e) => setForm({ ...form, order_type: e.target.value })} required />
-              <input className={styles.formInput} type="number" placeholder="سعر الطلب" value={form.order_amount} onChange={(e) => setForm({ ...form, order_amount: e.target.value })} required />
+              <input
+                className={styles.formInput}
+                placeholder="نوع الطلب (مثال: دجاج)"
+                value={form.order_type}
+                onChange={(e) =>
+                  setForm({ ...form, order_type: e.target.value })
+                }
+                required
+              />
+              <input
+                className={styles.formInput}
+                type="number"
+                placeholder="سعر الطلب"
+                value={form.order_amount}
+                onChange={(e) =>
+                  setForm({ ...form, order_amount: e.target.value })
+                }
+                required
+              />
             </div>
-            <input className={styles.formInput} type="number" placeholder="سعر التوصيل" value={form.delivery_fee} onChange={(e) => setForm({ ...form, delivery_fee: e.target.value })} required />
+            <input
+              className={styles.formInput}
+              type="number"
+              placeholder="سعر التوصيل"
+              value={form.delivery_fee}
+              onChange={(e) =>
+                setForm({ ...form, delivery_fee: e.target.value })
+              }
+              required
+            />
             <button
               type="submit"
               className={styles.submitButton}
               disabled={isSubmittingOrder}
-              style={{ opacity: isSubmittingOrder ? 0.7 : 1, cursor: isSubmittingOrder ? "not-allowed" : "pointer" }}
+              style={{
+                opacity: isSubmittingOrder ? 0.7 : 1,
+                cursor: isSubmittingOrder ? "not-allowed" : "pointer",
+              }}
             >
               {isSubmittingOrder ? "جارٍ الإرسال..." : "إرسال الطلبية"}
             </button>
@@ -346,18 +560,31 @@ export default function RestaurantDashboard() {
                 <div className={styles.stripMain}>
                   <div>
                     <div className={styles.line1}>
-                      {o.customer_name} | {o.order_type || "طلب"} | الطلب: {asIqd(o.order_amount)} | التوصيل: {asIqd(o.delivery_fee || 0)}
+                      {o.customer_name} | {o.order_type || "طلب"} | الطلب:{" "}
+                      {asIqd(o.order_amount)} | التوصيل:{" "}
+                      {asIqd(o.delivery_fee || 0)}
                     </div>
                     <div className={styles.line2}>
-                      {o.customer_address || "-"} | وقت الرفع: {asTime(o.created_at || o.accepted_at || o.updated_at)}
+                      {o.customer_address || "-"} | وقت الرفع:{" "}
+                      {asTime(o.created_at || o.accepted_at || o.updated_at)}
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <div
+                    style={{ display: "flex", gap: 8, alignItems: "center" }}
+                  >
                     {o.driver_id ? (
                       <button
                         onClick={() => showDriverInfo(o)}
                         title="معلومات السائق"
-                        style={{ border: "1px solid #cbd5e1", background: "#fff", color: "#0f172a", borderRadius: 10, padding: "8px 10px", fontWeight: 800, cursor: "pointer" }}
+                        style={{
+                          border: "1px solid #cbd5e1",
+                          background: "#fff",
+                          color: "#0f172a",
+                          borderRadius: 10,
+                          padding: "8px 10px",
+                          fontWeight: 800,
+                          cursor: "pointer",
+                        }}
                       >
                         👤
                       </button>
@@ -365,7 +592,16 @@ export default function RestaurantDashboard() {
                     {tab === "pending" ? (
                       <button
                         onClick={() => cancelPendingOrder(o.id)}
-                        style={{ border: "1px solid #fecaca", background: "#fee2e2", color: "#b91c1c", borderRadius: 10, padding: "5px 7px", fontWeight: 800, fontSize: ".66rem", cursor: "pointer" }}
+                        style={{
+                          border: "1px solid #fecaca",
+                          background: "#fee2e2",
+                          color: "#b91c1c",
+                          borderRadius: 10,
+                          padding: "5px 7px",
+                          fontWeight: 800,
+                          fontSize: ".66rem",
+                          cursor: "pointer",
+                        }}
                       >
                         إلغاء الطلبية
                       </button>
