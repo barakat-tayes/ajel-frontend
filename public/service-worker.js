@@ -1,18 +1,29 @@
 const CACHE_NAME = "ajel-pwa-v4";
-const URLS_TO_CACHE = ["/", "/index.html", "/manifest.json", "/icon-192.png", "/icon-512.png", "/icon-2000.png"];
+const URLS_TO_CACHE = [
+  "/",
+  "/index.html",
+  "/manifest.json",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/icon-2000.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(URLS_TO_CACHE))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(URLS_TO_CACHE)),
   );
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)),
+        ),
+      ),
   );
   self.clients.claim();
 });
@@ -53,7 +64,11 @@ self.addEventListener("fetch", (event) => {
 
         // Cache only successful same-origin basic responses.
         const sameOrigin = url.origin === self.location.origin;
-        const canCache = sameOrigin && networkRes && networkRes.ok && networkRes.type === "basic";
+        const canCache =
+          sameOrigin &&
+          networkRes &&
+          networkRes.ok &&
+          networkRes.type === "basic";
         if (canCache) {
           try {
             const cache = await caches.open(CACHE_NAME);
@@ -68,6 +83,41 @@ self.addEventListener("fetch", (event) => {
         const fallback = await caches.match("/index.html");
         return fallback || new Response("offline", { status: 503 });
       }
-    })()
+    })(),
   );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((list) => {
+        for (const client of list) {
+          if ("focus" in client) return client.focus();
+        }
+        if (clients.openWindow) return clients.openWindow("/");
+        return null;
+      }),
+  );
+});
+
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+  let payload = {};
+  try {
+    payload = event.data.json();
+  } catch {
+    payload = { title: "إشعار جديد", body: event.data.text() };
+  }
+  const title = payload.title || "إشعار جديد";
+  const options = {
+    body: payload.body || "",
+    icon: "/icon-192.png",
+    badge: "/icon-192.png",
+    data: payload.data || {},
+    dir: "rtl",
+    lang: "ar",
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
 });

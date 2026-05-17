@@ -76,8 +76,13 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!user || user.userType !== "admin") return;
     const s = io(SOCKET_BASE_URL);
+    const safeLoad = () => {
+      load().catch(() => {});
+    };
     s.emit("join", { userType: "admin", userId: user.id });
     [
+      "connect",
+      "reconnect",
       "new_order_created",
       "order_accepted",
       "order_delivered",
@@ -85,8 +90,12 @@ export default function AdminDashboard() {
       "order_cancelled",
       "driver_rejected",
       "new_join_request",
-    ].forEach((evt) => s.on(evt, () => load()));
-    return () => s.close();
+    ].forEach((evt) => s.on(evt, safeLoad));
+    const intervalId = setInterval(safeLoad, 15000);
+    return () => {
+      clearInterval(intervalId);
+      s.close();
+    };
   }, [user?.id, selectedProvince]);
 
   useEffect(() => {

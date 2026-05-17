@@ -6,6 +6,7 @@ import api from "./api";
 import { useAuth } from "./AuthContext";
 import styles from "./DriverDashboard.module.css";
 import { SOCKET_BASE_URL } from "./runtimeConfig";
+import { showSystemNotification } from "./notifications";
 
 export default function DriverDashboard() {
   const { user } = useAuth();
@@ -74,8 +75,15 @@ export default function DriverDashboard() {
       province: user.province,
     });
 
+    s.on("new_order", async (payload) => {
+      await showSystemNotification("طلبية جديدة متاحة", {
+        body: `عنوان الزبون: ${payload?.to || "-"} | كلفة الطلب: ${asIqd(payload?.orderAmount || 0)} | مبلغ التوصيل: ${asIqd(payload?.deliveryFee || 0)}`,
+        tag: `new-order-${payload?.orderId || Date.now()}`,
+      });
+      load();
+    });
+
     [
-      "new_order",
       "order_returned",
       "connect",
       "reconnect",

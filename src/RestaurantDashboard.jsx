@@ -6,6 +6,7 @@ import api from "./api";
 import { useAuth } from "./AuthContext";
 import styles from "./RestaurantDashboard.module.css";
 import { SOCKET_BASE_URL } from "./runtimeConfig";
+import { showSystemNotification } from "./notifications";
 
 const toLocalDate = (d = new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
@@ -128,7 +129,11 @@ export default function RestaurantDashboard() {
   useEffect(() => {
     if (!user?.id) return;
     const s = io(SOCKET_BASE_URL);
+    const refreshAll = () =>
+      Promise.all([loadOrders(), loadTracking(), loadDueSummary(), loadProfileFlags()]).catch(() => {});
     s.emit("join", { userType: "restaurant", userId: user.id });
+    s.on("connect", refreshAll);
+    s.on("reconnect", refreshAll);
     s.on("order_accepted", async (payload) => {
       await Promise.all([loadOrders(), loadTracking(), loadDueSummary()]);
       showOrderAcceptedToast(payload);
@@ -165,7 +170,11 @@ export default function RestaurantDashboard() {
       loadDueSummary();
     });
     s.on("admin_account_suspended", () => loadProfileFlags());
-    return () => s.close();
+    const intervalId = setInterval(refreshAll, 12000);
+    return () => {
+      clearInterval(intervalId);
+      s.close();
+    };
   }, [user?.id]);
 
   const applyQuickRange = (type) => {
@@ -270,6 +279,10 @@ export default function RestaurantDashboard() {
     const orderType = order?.order_type || "طلب";
     const orderAmount = asIqd(order?.order_amount || 0);
     const deliveryAmount = asIqd(order?.delivery_fee || 0);
+    await showSystemNotification("تم قبول طلبية", {
+      body: `${customerName} | ${orderType} | الطلب ${orderAmount} | التوصيل ${deliveryAmount} | السائق: ${driverName}`,
+      tag: `order-accepted-${orderId}`,
+    });
 
     await Swal.fire({
       toast: true,

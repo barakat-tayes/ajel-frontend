@@ -19,6 +19,7 @@ import DriverSuspendedPage from "./DriverSuspendedPage.jsx";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import { SOCKET_BASE_URL } from "./runtimeConfig";
+import { registerPushSubscription } from "./notifications";
 
 function Guard({ role, children }) {
   const { user } = useAuth();
@@ -195,6 +196,11 @@ function SessionSocketBridge() {
     s.on("account_deleted", () => logout());
     return () => s.close();
   }, [user?.id, user?.userType, user?.province, logout]);
+
+  useEffect(() => {
+    if (!user?.id || !user?.userType) return;
+    registerPushSubscription().catch(() => {});
+  }, [user?.id, user?.userType]);
 
   return null;
 }

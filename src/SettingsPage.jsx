@@ -4,6 +4,14 @@ import api from "./api";
 import { useAuth } from "./AuthContext";
 import styles from "./SettingsPage.module.css";
 import Swal from "sweetalert2";
+import {
+  ensureNotificationPermission,
+  isNotificationsEnabled,
+  notificationsSupported,
+  registerPushSubscription,
+  setNotificationsEnabled,
+  unregisterPushSubscription,
+} from "./notifications";
 
 const PROVINCES = [
   "بغداد",
@@ -62,11 +70,22 @@ export default function SettingsPage() {
     username: "",
     password: "",
   });
+  const [notificationsOn, setNotificationsOn] = useState(() =>
+    isNotificationsEnabled(),
+  );
   const [msg, setMsg] = useState("");
   const [locating, setLocating] = useState(false);
   const isRestaurant = user?.userType === "restaurant";
   const contactPhone = String(adminSettings.contact_phone || "").trim();
   const whatsappLink = buildWhatsAppLink(adminSettings.contact_whatsapp);
+
+  useEffect(() => {
+    if (notificationsOn) {
+      registerPushSubscription().catch(() => {});
+    } else {
+      unregisterPushSubscription().catch(() => {});
+    }
+  }, [notificationsOn]);
 
   const confirmLogout = async () => {
     const result = await Swal.fire({
@@ -80,6 +99,29 @@ export default function SettingsPage() {
       cancelButtonColor: "#64748b",
     });
     if (result.isConfirmed) logout();
+  };
+
+  const toggleNotifications = async () => {
+    if (!notificationsSupported()) {
+      setMsg("المتصفح لا يدعم إشعارات النظام");
+      return;
+    }
+    if (notificationsOn) {
+      setNotificationsEnabled(false);
+      setNotificationsOn(false);
+      setMsg("تم إيقاف الإشعارات");
+      return;
+    }
+    const perm = await ensureNotificationPermission();
+    if (perm === "granted") {
+      setNotificationsEnabled(true);
+      setNotificationsOn(true);
+      setMsg("تم تفعيل الإشعارات");
+    } else {
+      setNotificationsEnabled(false);
+      setNotificationsOn(false);
+      setMsg("لم يتم منح إذن الإشعارات");
+    }
   };
 
   useEffect(() => {
@@ -253,11 +295,19 @@ export default function SettingsPage() {
               onClick={() => setSection("contact")}
             >
               اتصل بنا
-            </button>
-            <button
-              className={`${styles.tile} ${styles.tileDanger}`}
-              onClick={confirmLogout}
-            >
+              </button>
+              <button
+                className={`${styles.tile} ${
+                  section === "notifications" ? styles.tileActive : ""
+                }`}
+                onClick={() => setSection("notifications")}
+              >
+                الإشعارات
+              </button>
+              <button
+                className={`${styles.tile} ${styles.tileDanger}`}
+                onClick={confirmLogout}
+              >
               تسجيل الخروج
             </button>
           </div>
@@ -625,6 +675,18 @@ export default function SettingsPage() {
             >
               {adminSettings.policy_text || DEFAULT_POLICY}
             </p>
+          </div>
+        ) : null}
+
+        {user.userType !== "admin" && section === "notifications" ? (
+          <div className={styles.card}>
+            <strong>إعدادات الإشعارات</strong>
+            <p style={{ margin: "10px 0", color: "#475569" }}>
+              {notificationsOn ? "الإشعارات مفعلة حاليًا" : "الإشعارات متوقفة حاليًا"}
+            </p>
+            <button className={styles.btn} onClick={toggleNotifications}>
+              {notificationsOn ? "إيقاف الإشعارات" : "تفعيل الإشعارات"}
+            </button>
           </div>
         ) : null}
       </div>

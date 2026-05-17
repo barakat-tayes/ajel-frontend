@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import api from "./api";
 import styles from "./Login.module.css";
+import { ensureNotificationPermission, setNotificationsEnabled } from "./notifications";
 
 const PROVINCES = [
   "بغداد",
@@ -23,21 +25,6 @@ const PROVINCES = [
   "دهوك",
   "السليمانية",
 ];
-
-const INITIAL_FORM_DATA = {
-  name: "",
-  owner_name: "",
-  phone: "",
-  province: "ظ†ظٹظ†ظˆظ‰",
-  address: "",
-  location_lat: "",
-  location_lng: "",
-  location_link: "",
-  vehicle_type: "",
-  vehicle_plate: "",
-  password: "",
-  confirmPassword: "",
-};
 
 export default function Register() {
   const navigate = useNavigate();
@@ -61,14 +48,11 @@ export default function Register() {
   const [locating, setLocating] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const hasArabicChars = (value = "") =>
-    /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(
-      String(value),
-    );
-  const hasWhitespace = (value = "") => /\s/.test(String(value));
 
-  const onChange = (e) =>
-    setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
+  const hasArabicChars = (value = "") =>
+    /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(String(value));
+  const hasWhitespace = (value = "") => /\s/.test(String(value));
+  const onChange = (e) => setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const resetRegisterForm = () =>
     setFormData({
@@ -140,15 +124,33 @@ export default function Register() {
       (!String(formData.location_lat || "").trim() ||
         !String(formData.location_lng || "").trim())
     ) {
-      setError("يرجى تحديد الموقع  قبل التسجيل");
+      setError("يرجى تحديد الموقع قبل التسجيل");
       return;
     }
+
     try {
       if (accountType === "restaurant") {
         await api.post("/auth/register/restaurant", formData);
       } else {
         await api.post("/auth/register/driver", formData);
       }
+
+      const ask = await Swal.fire({
+        icon: "question",
+        title: "تفعيل الإشعارات",
+        text: "هل تريد تفعيل الإشعارات الآن؟ يمكنك إيقافها لاحقًا من الإعدادات.",
+        showCancelButton: true,
+        confirmButtonText: "نعم",
+        cancelButtonText: "لاحقًا",
+        confirmButtonColor: "#e31e24",
+      });
+      if (ask.isConfirmed) {
+        const perm = await ensureNotificationPermission();
+        setNotificationsEnabled(perm === "granted");
+      } else {
+        setNotificationsEnabled(false);
+      }
+
       setOk("تم إنشاء الحساب بنجاح");
       setTimeout(() => navigate("/login"), 1200);
     } catch (err) {
@@ -160,15 +162,9 @@ export default function Register() {
     <div className={styles.authPage} dir="rtl">
       <div className={styles.card} style={{ maxWidth: 700 }}>
         <div className={styles.logoWrap}>
-          <img
-            src="/icon-512.png"
-            alt="Ajel Logo"
-            className={styles.logoImage}
-          />
+          <img src="/icon-512.png" alt="Ajel Logo" className={styles.logoImage} />
           <h2 className={styles.title}>تسجيل حساب جديد</h2>
-          <p className={styles.subtitle}>
-            أدخل بياناتك الأساسية كما هي لطلب التفعيل
-          </p>
+          <p className={styles.subtitle}>أدخل بياناتك الأساسية كما هي لطلب التفعيل</p>
         </div>
 
         {error && <div className={styles.error}>{error}</div>}
@@ -179,20 +175,14 @@ export default function Register() {
             <div className={styles.accountTypeSwitch}>
               <button
                 type="button"
-                className={`${styles.accountTypeBtn} ${
-                  accountType === "restaurant"
-                    ? styles.accountTypeBtnActive
-                    : ""
-                }`}
+                className={`${styles.accountTypeBtn} ${accountType === "restaurant" ? styles.accountTypeBtnActive : ""}`}
                 onClick={() => switchAccountType("restaurant")}
               >
                 حساب تاجر
               </button>
               <button
                 type="button"
-                className={`${styles.accountTypeBtn} ${
-                  accountType === "driver" ? styles.accountTypeBtnActive : ""
-                }`}
+                className={`${styles.accountTypeBtn} ${accountType === "driver" ? styles.accountTypeBtnActive : ""}`}
                 onClick={() => switchAccountType("driver")}
               >
                 حساب سائق
@@ -203,65 +193,28 @@ export default function Register() {
               <input
                 name="name"
                 className={styles.input}
-                placeholder={
-                  accountType === "restaurant" ? "اسم الشركة" : "اسم السائق"
-                }
+                placeholder={accountType === "restaurant" ? "اسم الشركة" : "اسم السائق"}
                 onChange={onChange}
                 required
               />
               {accountType === "restaurant" ? (
-                <input
-                  name="owner_name"
-                  className={styles.input}
-                  placeholder="اسم المالك"
-                  onChange={onChange}
-                  required
-                />
+                <input name="owner_name" className={styles.input} placeholder="اسم المالك" onChange={onChange} required />
               ) : (
-                <input
-                  name="vehicle_type"
-                  className={styles.input}
-                  placeholder="نوع المركبة"
-                  onChange={onChange}
-                  required
-                />
+                <input name="vehicle_type" className={styles.input} placeholder="نوع المركبة" onChange={onChange} required />
               )}
             </div>
 
             <div className={styles.grid2}>
-              <input
-                name="phone"
-                className={styles.input}
-                placeholder="رقم الهاتف"
-                onChange={onChange}
-                required
-              />
+              <input name="phone" className={styles.input} placeholder="رقم الهاتف" onChange={onChange} required />
               {accountType === "restaurant" ? (
-                <input
-                  name="address"
-                  className={styles.input}
-                  placeholder="العنوان الدقيق"
-                  onChange={onChange}
-                  required
-                />
+                <input name="address" className={styles.input} placeholder="العنوان الدقيق" onChange={onChange} required />
               ) : (
-                <input
-                  name="vehicle_plate"
-                  className={styles.input}
-                  placeholder="رقم اللوحة"
-                  onChange={onChange}
-                  required
-                />
+                <input name="vehicle_plate" className={styles.input} placeholder="رقم اللوحة" onChange={onChange} required />
               )}
             </div>
 
             <div className={styles.grid2}>
-              <select
-                name="province"
-                className={styles.input}
-                value={formData.province}
-                onChange={onChange}
-              >
+              <select name="province" className={styles.input} value={formData.province} onChange={onChange}>
                 {PROVINCES.map((p) => (
                   <option key={p} value={p}>
                     {p}
@@ -284,31 +237,11 @@ export default function Register() {
             {accountType === "restaurant" ? (
               <>
                 <div className={styles.grid2}>
-                  <input
-                    name="location_lat"
-                    className={styles.input}
-                    placeholder="خط العرض"
-                    value={formData.location_lat}
-                    onChange={onChange}
-                    readOnly
-                  />
-                  <input
-                    name="location_lng"
-                    className={styles.input}
-                    placeholder="خط الطول"
-                    value={formData.location_lng}
-                    onChange={onChange}
-                    readOnly
-                  />
+                  <input name="location_lat" className={styles.input} placeholder="خط العرض" value={formData.location_lat} onChange={onChange} readOnly />
+                  <input name="location_lng" className={styles.input} placeholder="خط الطول" value={formData.location_lng} onChange={onChange} readOnly />
                 </div>
-
-                <button
-                  type="button"
-                  className={styles.linkButton}
-                  onClick={pickCurrentLocation}
-                  disabled={locating}
-                >
-                  تحديد موقعي الحالي
+                <button type="button" className={styles.linkButton} onClick={pickCurrentLocation} disabled={locating}>
+                  {locating ? "جاري التحديد..." : "تحديد موقعي الحالي"}
                 </button>
               </>
             ) : null}
@@ -323,17 +256,7 @@ export default function Register() {
                   onChange={onChange}
                   required
                 />
-                <button
-                  type="button"
-                  className={styles.passwordToggle}
-                  onClick={() => setShowPassword((v) => !v)}
-                  title={
-                    showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"
-                  }
-                  aria-label={
-                    showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"
-                  }
-                >
+                <button type="button" className={styles.passwordToggle} onClick={() => setShowPassword((v) => !v)}>
                   {showPassword ? "🙈" : "👁"}
                 </button>
               </div>
@@ -346,21 +269,7 @@ export default function Register() {
                   onChange={onChange}
                   required
                 />
-                <button
-                  type="button"
-                  className={styles.passwordToggle}
-                  onClick={() => setShowConfirmPassword((v) => !v)}
-                  title={
-                    showConfirmPassword
-                      ? "إخفاء كلمة المرور"
-                      : "إظهار كلمة المرور"
-                  }
-                  aria-label={
-                    showConfirmPassword
-                      ? "إخفاء كلمة المرور"
-                      : "إظهار كلمة المرور"
-                  }
-                >
+                <button type="button" className={styles.passwordToggle} onClick={() => setShowConfirmPassword((v) => !v)}>
                   {showConfirmPassword ? "🙈" : "👁"}
                 </button>
               </div>
@@ -379,3 +288,4 @@ export default function Register() {
     </div>
   );
 }
+
